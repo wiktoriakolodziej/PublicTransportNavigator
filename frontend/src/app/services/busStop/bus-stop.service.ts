@@ -150,7 +150,11 @@ export class BusStopService {
 
   getNamesByFragment(fragment: string) : Observable<BusStopDTO[]>{
     var user = JSON.parse(localStorage.getItem('userData')!) as UserInfo;
-    const params = new HttpParams().set('userId', user.id);
+    let params = new HttpParams();
+
+    if (user?.id) {
+      params = params.set('userId', user.id);
+    }
     var result =  this.http.get<BusStopDTO[]>(`${this.baseUrl}/${this.serviceUrl}/fragment/${fragment}`, {params});
     return result;
     

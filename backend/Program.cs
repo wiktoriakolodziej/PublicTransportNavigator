@@ -31,7 +31,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IBusRepository, BusRepository>();
 builder.Services.AddScoped<IBusStopRepository, BusStopRepository>();
-
+builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
