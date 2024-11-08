@@ -1,0 +1,6 @@
+@PublicTransportNavigator_HostAddress = http://localhost:5022
+
+GET {{PublicTransportNavigator_HostAddress}}/api/
+Accept: application/json
+
+###
