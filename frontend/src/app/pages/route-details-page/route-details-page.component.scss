@@ -1,0 +1,102 @@
+.button{
+    border: transparent;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.sidenav{
+    position: absolute;
+    width: 100%;
+    height: 80%;
+    overflow-y: auto;
+}
+
+.example-container {
+    background-color:transparent;
+    height: inherit;
+    width: fit-content;
+    overflow-y:scroll;  
+    scrollbar-width: none;
+    
+  }
+  
+.button-place {
+    display: flex;
+    height: inherit;
+    align-items: center;
+
+}
+
+.sidenav-content {
+    width: fit-content;
+    height: fit-content;
+    
+}
+
+.map{
+    height:  inherit;
+}
+
+.map-container{
+    height: inherit;
+}
+.content{
+    height: inherit;
+}
+#reserve-seat-button{
+    padding-top: 2%;
+    padding-bottom: 1%;
+}
+
+
+
+#seat-selection-side{
+    position:absolute;
+    right: 0%;
+    z-index: 1;
+   
+}
+
+#bus-image {
+    width: auto;
+    height: 70vh;
+}
+
+.seat {
+    position: absolute;
+    border: 1px solid white;
+    cursor: pointer;
+    color: white;
+    text-align: center;
+}
+#bus-name{
+    display: flex;
+    justify-content: center;
+
+}
+
+
+@media(max-width: 500px){
+    .searchBox{
+        width: 100%;
+        min-width: 300px;
+    }
+}
+
+
+#test{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.mat-card{
+    
+}
+
+
+  
+
+  
+  

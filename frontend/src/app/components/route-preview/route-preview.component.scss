@@ -1,0 +1,31 @@
+.content{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: inherit;
+    min-width: inherit;
+    
+}
+.element{
+    font-size: 1.5vw;  
+}
+.buttons{
+    display: flex;
+    justify-content: space-around;
+}
+
+.mat-card{
+    box-shadow: none; 
+    border: none; 
+    background-color: #c5ceeb;;
+}
+#mat-card-content{
+    width: inherit;
+}
+#mat-card-main{
+    width:auto;
+    min-width: fit-content;
+    background-color: #e2e6f6;
+    border: transparent;
+    border-radius: 10px 10px 10px 10px;
+}

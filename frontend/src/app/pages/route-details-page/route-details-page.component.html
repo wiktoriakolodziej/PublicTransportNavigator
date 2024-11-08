@@ -1,0 +1,55 @@
+ <div id=test> 
+  <app-header class="header"></app-header>
+  <div class="content">
+    <div class="sidenav"> 
+        <mat-drawer-container class="example-container" autosize>
+          <mat-drawer #drawer class="sidenav-content" mode="side"  [opened]=true>
+            <app-route-preview [copy]=busRoute></app-route-preview>
+            @for(details of routeDetails; track details){
+              <app-route-details [routeDetailsDTO]=details></app-route-details>
+            }
+            <div id="reserve-seat-button" [hidden]="!checkIfLoggedIn()">
+              <button mat-flat-button (click)="reserveSeats()" [hidden]="!canReserveSeat">Reserve seat</button>
+            </div>        
+          </mat-drawer>
+
+          <div class="button-place">
+            <button type="button" mat-fab (click)="drawer.toggle()">
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+          </div>
+
+        </mat-drawer-container>
+    </div>
+    <div id="seat-selection-side" [hidden]="!isReserveSeats || !checkIfLoggedIn()">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div id="bus-name-header">
+            <mat-card appearance="outlined">
+              <mat-card-content id="bus-name">{{routeDetails[reservingForBus].timetableIn.busName}}</mat-card-content>
+            </mat-card>
+          </div>
+          <div id="image">
+            <img src="assets/images/busImage.jpg" id="bus-image"/>
+            <button 
+              class="seat"
+              [style.background-color]="isSeatReserved(seat) ? 'red' : isSeatChosen(seat) ? 'blue' : 'green'"         
+              *ngFor="let seat of seats" 
+              (click)="reserveSeat(seat)"
+              [style.top.%]="seat.coordY"
+              [style.left.%]="seat.coordX">
+              {{ seat.label }}
+            </button>
+          </div>
+          <div id="next-seat-button">
+            <button mat-flat-button (click)="nextOrFinishButtonLabel != 'confirm' ? nextSeat() : confirm()">{{nextOrFinishButtonLabel}}</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="map-container">
+      <app-map class="map"></app-map>
+    </div>
+  </div>
+ </div>

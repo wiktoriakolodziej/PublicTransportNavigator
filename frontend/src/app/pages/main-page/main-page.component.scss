@@ -1,0 +1,23 @@
+.search-box{
+    position: relative;
+    width: 70%;
+    min-width: fit-content;   
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%); /* Centers the div */ 
+}
+
+
+.header-container {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    width: 100vw; /* Full width */
+    height: 100vh;  
+}
+
+#header{
+    position: sticky;
+}
+
+
+  

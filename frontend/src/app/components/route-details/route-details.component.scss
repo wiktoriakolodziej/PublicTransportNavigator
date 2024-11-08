@@ -1,0 +1,77 @@
+#bus-number{
+    width: 20%;
+    min-width: fit-content;
+    height: 90%;
+    max-height: 110px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #dfe4f5;;
+    box-shadow: none;
+}
+#bus-number-content{
+    font-size: x-large;
+}
+.mat-card{
+    height: fit-content;
+    
+    border: none;
+    background: 
+        linear-gradient(to right, #a5b9f8 0px, #c5ceeb 20px, #ffffff 100%, transparent 80%);
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: 100% 5px; /* Line height */
+    border-radius: 0%;
+}
+
+#content{
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    //justify-content: space-between;
+    min-height: fit-content;
+}
+
+#rightPanel{
+
+    display: flex;
+    flex-direction: column;
+    flex-grow: 5;
+    padding-left: 10%;
+    min-height: fit-content;
+}
+#arrow{
+    width: 30%;
+    height: 30%;
+    min-width: 25px;
+    min-height: fit-content;
+}
+
+#arrow-button{
+    width: inherit;
+    height: inherit;
+    min-width: inherit; 
+}
+
+#bus-stops-display{
+    display: flex;
+    align-items: center;
+    min-height: fit-content;
+}
+
+#arrow-button-bus-stops-view{
+    width: 25px;
+    height: 25px;
+    min-width: 25px;
+}
+#button-bus-stops-view{
+    padding-left: 20%;
+}
+
+#bus-stops{
+    min-height: fit-content;
+}
+.bold{
+    font-weight: bold;
+}

@@ -1,0 +1,33 @@
+<mat-card appearance="outlined" id="mat-card-main">
+    <mat-card-content id="mat-card-content">
+        <div class="content">
+            <div class="element">
+                <mat-card class="mat-card">
+                    <mat-card-content>{{timeIn}}</mat-card-content>
+                </mat-card>
+            </div>
+            <div class="element">
+                <mat-card class="mat-card">
+                    <mat-card-content>
+                        <div class="buttons">
+                            @for(bus of buses; track bus){
+                                
+                                <button mat-flat-button>{{bus}}</button>                          
+                            }
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div class="element" >
+                <mat-card class="mat-card">
+                    <mat-card-content>{{timeOut}}</mat-card-content>
+                </mat-card>
+            </div>
+            <div class="element" >
+                <mat-card class="mat-card">
+                    <mat-card-content>{{duration}}</mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

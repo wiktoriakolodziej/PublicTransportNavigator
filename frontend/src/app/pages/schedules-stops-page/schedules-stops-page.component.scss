@@ -1,0 +1,40 @@
+app-schedules-footer {
+    position: fixed; /* Fix the footer at the bottom */
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+app-header {
+    position: sticky; /* Keep the header fixed at the top */
+    top: 0;
+    z-index: 1; /* Ensure it stays above other elements */
+}
+
+.mat-card{
+  display: flex;
+  flex: 1;
+  height: 60%;
+  align-items: center;
+  justify-content: center;
+  background-color: #dfe4f5;
+  margin-right: 10%;
+  margin-left: 10%;
+  border: transparent;
+
+}
+
+.mat-card-content{
+  cursor:pointer; 
+  display: flex;
+  align-items: baseline;
+}
+
+#name{
+  font-size: 1.5rem;
+}
+
+#on-request{
+  font-size: 1rem;
+  margin-left: 5px;
+}

@@ -1,0 +1,38 @@
+.table{
+    display: flex;
+    margin-top: 1%;
+}
+.bus-line-name{
+    flex: 1;
+    margin-left: 10%;
+    border: transparent;
+    background-color: #c5ceeb;
+    align-items: center;
+}
+.hours{
+    flex: 3;
+    margin-left: 5%;
+    margin-right: 10%;
+    border: transparent;
+    background-color: #dfe4f5;
+}
+
+#bus-stop-name{
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    
+}
+#name{
+    font-size: 2rem;
+}
+#on-request{
+    font-size: 1rem;
+    margin-left: 4px;
+}
+
+#mat-card-bus-stop-name{
+    border: transparent;
+    background-color: #dfe4f5;
+    margin-bottom: 3vh;
+}

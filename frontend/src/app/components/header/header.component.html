@@ -1,0 +1,24 @@
+<header>
+  <mat-card class="mat-card">
+    <mat-card-content class="mat-card-content">
+
+      <div class="header">
+
+        <div>
+          <h1>
+            <button class="title" (click)="onTitle()">Easy Commute</button>
+          </h1>
+        </div>
+
+        <div class="buttons">
+          <button class="button" mat-flat-button (click)="onSchedules()">Schedules</button>
+          <button class="button" mat-raised-button (click)="performAction()">{{checkLogin() ? "Log Out" : "Log In"}}</button>
+          <button class="button" mat-flat-button (click)="goToProfile()" [hidden]="!checkLogin()">Profile</button>
+        </div>
+
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+</header>
+  

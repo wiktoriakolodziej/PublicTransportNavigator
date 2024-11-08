@@ -1,0 +1,23 @@
+html, body {
+    height: 100%; /* Ensure the body takes the full height */
+    margin: 0; /* Remove default margins */
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Minimum height of the container is full viewport height */
+  }
+  
+  app-header {
+    position: sticky; /* Keep the header fixed at the top */
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other elements */
+  }
+  
+  app-schedules-footer {
+    position: fixed; /* Fix the footer at the bottom */
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }

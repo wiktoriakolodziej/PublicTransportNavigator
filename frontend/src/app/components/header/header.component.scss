@@ -1,0 +1,53 @@
+.header{
+    display: flex;
+    justify-content:space-between;
+    align-items: center; /* Vertically align content in the header */
+    color: #333; /* Change the text color */
+    width: 100%;
+}
+.buttons{
+    display: flex;
+    gap: 16px; /* Add horizontal space between the buttons */
+}
+.mat-card{
+    box-shadow: none; /* Remove shadow */
+    border: none; /* Remove border */
+    background-color: #f0f4ff; /* Light blue background for the card */
+    padding: 2% 2% 0 2%; /* Top, right, bottom (0), left */
+    height:fit-content; /* Adjust height based on content */ 
+    min-width: fit-content;
+}
+
+.button{
+    font-size: 1rem; /* Increase font size */
+}
+
+.title{
+    background-color: transparent; /* Make background transparent */
+    border: none; /* Remove the button border */
+    font-size: 3rem; /* Adjust font size to match the title */
+    font-weight: bold; /* Make the font bold */
+    color: inherit; /* Inherit the color of the text */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+
+/* For small screens (e.g., phones) */
+@media (max-width: 480px) {
+    .title {
+        font-size: 2rem; /* Smaller font size for phones */
+        text-align: left; /* Align title to the left */
+        margin-top: 1.5rem
+    }
+    .buttons {
+        margin-left: 1.5rem;
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px; /* Adjust space between buttons */
+        width: 100%; /* Ensure buttons take full width */
+    }
+
+    .button {
+        width: 100%; /* Make each button full width */
+    }
+}
+

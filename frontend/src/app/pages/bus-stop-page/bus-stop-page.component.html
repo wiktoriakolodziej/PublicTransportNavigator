@@ -1,0 +1,27 @@
+<app-header></app-header>
+<mat-card appearance="outlined" id="mat-card-bus-stop-name">
+    <mat-card-content id="bus-stop-name">
+        <div id="name">
+            {{busStopDetails!.name}}
+        </div>
+        <div id="on-request">
+            {{busStopDetails!.onRequest ? "on request" : ""}}
+        </div>
+        </mat-card-content>
+</mat-card>
+@for(element of busStopDetails!.buses; track element){
+    <div class="table">
+        <mat-card appearance="outlined" class="bus-line-name">
+            <mat-card-content>{{element.number}}</mat-card-content>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="hours">
+            <mat-card-content>
+                @for(hour of element.time; track hour){
+                    {{hour}}, 
+                }
+            </mat-card-content>
+        </mat-card>  
+    </div>
+}
+

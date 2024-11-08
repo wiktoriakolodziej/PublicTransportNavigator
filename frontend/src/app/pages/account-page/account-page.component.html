@@ -1,0 +1,49 @@
+<div id="content">
+    <app-header></app-header>
+    <mat-card appearance="outlined" id="mat-card">
+        <mat-card-content id="table">
+            <div id="left-column">
+                <mat-card appearance="outlined" >
+                    <mat-card-content id="history">history: 
+                        @for(element of history; track element){
+                            <button class="button" (click)="routeDetails(element)" class="route-details-button">
+                                <app-route-preview [copy]="element"></app-route-preview>
+                            </button>
+                        }
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div id="right-column">
+                <div id="name">
+                    <mat-card appearance="outlined">
+                        <mat-card-content>name: {{user?.name}}
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <div id="surname">
+                    <mat-card appearance="outlined">
+                        <mat-card-content>surname: {{user?.surname}}</mat-card-content>
+                    </mat-card>
+                </div>
+                <div id="discounts">
+                    <mat-card appearance="outlined">
+                        <mat-card-content>discounts: 
+                            @for (discount of user?.discounts; track discount){
+                                <mat-chip (click)="showInfo(discount.description)">{{discount.name}}</mat-chip>
+                            }
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <div id="favourites">
+                    <mat-card appearance="outlined">
+                        <mat-card-content>favourite stops: 
+                            @for (stop of user?.favouriteBusStops; track stop){
+                                <mat-chip (click)="showInfo(stop.name)">{{stop.userName}}</mat-chip>
+                            }
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>  
+        </mat-card-content>
+    </mat-card>
+</div>

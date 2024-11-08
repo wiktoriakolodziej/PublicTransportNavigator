@@ -1,0 +1,9 @@
+<mat-grid-list cols={{columns}}  rowHeight="1:1">
+    @for (tile of tiles; track tile) {
+        <mat-grid-tile [rowspan]=1>
+            <button mat-flat-button (click)="onBusLine(tile)">
+                {{tile}}
+            </button>
+        </mat-grid-tile>
+      }
+</mat-grid-list>

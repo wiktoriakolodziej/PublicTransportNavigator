@@ -1,0 +1,33 @@
+<div class="content">
+  <app-header class="header"></app-header>
+  <div id="map-with-sidenav">
+          <div class="sidenav">
+            <mat-drawer-container class="example-container">
+              <mat-drawer #drawer class="sidenav-content" mode="side"[opened]=true>
+                  <div class="element">
+                      <app-search-box layoutType="horizontal"></app-search-box>
+                  </div>
+                  <div class="element">
+                    @for(route of routes; track route){
+                      <button (click)="routeDetails(route)" class="routeButton">
+                        <app-route-preview [copy]="route"></app-route-preview>
+                      </button>
+                    }
+                  </div>
+              </mat-drawer>
+              <div id="button-place">
+                <button type="button" mat-fab (click)="drawer.toggle()">
+                  <mat-icon>swap_horiz</mat-icon>
+                </button>
+              </div>
+            </mat-drawer-container>
+          </div>
+
+          <div class="map-container">
+            <app-map class="map"></app-map>
+          </div>
+  </div>
+</div>
+
+
+

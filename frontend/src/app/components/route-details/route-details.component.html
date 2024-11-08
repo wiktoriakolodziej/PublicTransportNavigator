@@ -1,0 +1,36 @@
+<mat-card appearance="outlined" class="mat-card">
+    <mat-card-content id="content">
+        <mat-card  id="bus-number">
+            <mat-card-content id="bus-number-content"> {{routeDetailsDTO.timetableIn.busName}} </mat-card-content>
+        </mat-card>
+        <div id="rightPanel">
+            <div [ngClass]="{ 'bold': shouldShowBusStops }">
+                {{routeDetailsDTO.timetableIn.time}} from: {{routeDetailsDTO.timetableIn.busStopName}}
+            </div>
+            <div id="arrow">
+                @if(!shouldShowBusStops){
+                    <button mat-fab id="arrow-button" (click)="getBusStops()">
+                        <mat-icon id="icon">keyboard_arrow_down</mat-icon>
+                    </button>
+                }
+                @else{
+                    <div id="bus-stops-display">
+                        <div id="bus-stops">
+                            @for(busStop of busStops; track busStop){
+                                {{busStop.name}}
+                            }
+                        </div>
+                        <div id="button-bus-stops-view">
+                            <button mat-fab id="arrow-button-bus-stops-view" (click)="getBusStops()">
+                                <mat-icon id="icon">keyboard_arrow_up</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div [ngClass]="{ 'bold': shouldShowBusStops }">
+                {{routeDetailsDTO.timetableOut.time}} to: {{routeDetailsDTO.timetableOut.busStopName}}
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

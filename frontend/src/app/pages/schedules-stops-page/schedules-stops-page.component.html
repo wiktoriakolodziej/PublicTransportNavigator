@@ -1,0 +1,23 @@
+<div id="content">
+    <app-header ></app-header>
+    <mat-grid-list cols={{columns}}  rowHeight= "5:1" id="table">
+        @for (busStop of busStops; track busStop) {
+            <mat-grid-tile [rowspan]=1>
+                <mat-card appearance="outlined" class="mat-card">
+                    <mat-card-content (click)="goToBusStop(busStop.id)" class="mat-card-content"> 
+                        <div id="name">
+                            {{busStop.name}} 
+                        </div>
+                        <div id="on-request">
+                            {{busStop.onRequest ? "on request" : ""}}
+                        </div>
+                    </mat-card-content>
+
+                </mat-card>
+               
+            </mat-grid-tile>
+          }
+    </mat-grid-list>
+    <app-schedules-footer ></app-schedules-footer>
+</div>
+  

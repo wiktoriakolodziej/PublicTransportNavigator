@@ -1,0 +1,37 @@
+.mat-card {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center the content */
+    box-shadow: none; /* Remove shadow */
+    background-color: #f0f4ff; /* Light blue background for the card */
+  }
+  
+  .button-container {
+    display: flex; /* Align items horizontally */
+    align-items: stretch; /* Ensure buttons stretch to the same height */
+    width: 100%; /* Take full width of the card */
+  }
+  
+  .button {
+    flex: 1; /* Allow buttons to grow */
+    padding: 16px; /* Add padding to the buttons */
+    background-color: transparent; /* Set background to transparent */
+    color: inherit; /* Inherit color from the card background */
+    border: none; /* Remove border */
+    box-shadow: none; /* Remove shadow (if any) */
+    outline: none; /* Remove outline on focus */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    font-size: 1rem; /* Increase font size (adjust as needed) */
+    font-weight: bold; /* Make text bold */
+    color: #333; /* Change the text color */
+  }
+  
+  .divider {
+    width: 1px; /* Width of the vertical line */
+    background-color: #333; /* Change the text color */; /* Color of the vertical line */
+    margin: 0 16px; /* Space around the vertical line */
+  }
+
+  .button:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Change color on hover */
+  }
+  

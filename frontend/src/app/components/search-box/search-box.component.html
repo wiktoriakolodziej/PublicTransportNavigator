@@ -1,0 +1,64 @@
+<mat-card appearance="outlined" [ngClass]="layoutType">
+  <mat-card-content id="mat-card">
+    <div class="row">
+      <div class="element">
+        <form>
+                <mat-form-field class="autocomplete">
+                  <mat-label>From</mat-label>
+                  <input #inputFrom
+                        type="text"
+                        placeholder="type start stop"
+                        matInput
+                        [formControl]="fromControl"
+                        [matAutocomplete]="autoFrom"
+                        (input)="filter('from')"
+                        (focus)="filter('from')">
+                  <mat-autocomplete requireSelection #autoFrom="matAutocomplete">
+                    @for (option of filteredFromOptions; track option) {
+                      <mat-option [value]="option">{{option}}</mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+        </form>
+      </div>
+      <div class="element">
+        <form>
+                  <mat-form-field class="autocomplete">
+                    <mat-label>To</mat-label>
+                    <input #inputTo
+                          type="text"
+                          placeholder="type destination stop"
+                          matInput
+                          [formControl]="toControl"
+                          [matAutocomplete]="autoTo"
+                          (input)="filter('to')"
+                          (focus)="filter('to')"
+                          >
+                    <mat-autocomplete requireSelection #autoTo="matAutocomplete">
+                      @for (option of filteredToOptions; track option) {
+                        <mat-option [value]="option">{{option}}</mat-option>
+                      }
+                    </mat-autocomplete>
+                  </mat-form-field>
+        </form>
+      </div>
+
+    </div> 
+    <div class="row">
+
+      <div class="element">
+                <mat-form-field class="DatePicker">
+                  <mat-label>Choose a date</mat-label>
+                  <input matInput [matDatepicker]="picker" [formControl]="dateControl" readonly>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+      </div>
+      <div class="element">
+                <button class="button" mat-raised-button [disabled]="!isFormComplete()" (click)="searchRoutes()">Search</button>
+      </div>
+
+    </div>
+  </mat-card-content>
+</mat-card>
+

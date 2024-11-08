@@ -1,0 +1,60 @@
+
+.content{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+#map-with-sidenav{
+    height: inherit;
+}
+
+.sidenav{
+    position: absolute;
+    width: 100%;
+    height: 80%;
+    overflow-y: auto;
+}
+
+.example-container{
+    background-color:transparent;
+    height:inherit;
+    width: fit-content;
+    overflow-y:scroll;  
+    scrollbar-width: none;
+}
+
+.sidenav-content{
+    padding: 20px;
+    width: fit-content;
+    height: fit-content;
+}
+
+#button-place{
+    display: flex;
+    height: 150px;
+    align-items: center;
+}
+
+.element{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.routeButton{
+    border: transparent;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.map-container{
+    height: inherit;
+}
+
+.map{
+    height: inherit;
+}
+
+
