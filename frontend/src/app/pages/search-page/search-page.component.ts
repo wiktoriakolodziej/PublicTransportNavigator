@@ -9,6 +9,7 @@ import { MapComponent } from '../../components/map/map.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { CoordinateDTO } from '../../models/coordinateDTO';
 
 @Component({
   selector: 'app-search-page',
@@ -26,10 +27,13 @@ import { MatIconModule } from '@angular/material/icon';
 export class SearchPageComponent implements OnInit {
 
   showFiller = false;
-  from: string = '';
-  to: string = '';
+  from: number = -1;
+  to: number = -1;
+  time: string = '';
   date: string = '';
   routes: RoutePreviewDTO[] = [];
+
+  higlightedRoute: CoordinateDTO[] = [];
 
   constructor(private route: ActivatedRoute, private service: TimetableService, private router: Router) {}
 
@@ -37,23 +41,34 @@ export class SearchPageComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.from = params['from'];
       this.to = params['to'];
+      this.time = params['time'];
       this.date = params['date'];
     });
     this.getRoutes();
+    console.log("highlighted route before: " + this.higlightedRoute);
+    this.higlightedRoute = this.routes[0].coordinates;
+    console.log("highlighted route: " + this.higlightedRoute);
   }
 
   getRoutes() {
-    this.service.getRoutes(this.from, this.to, this.date).subscribe({
-      next: (data: RoutePreviewDTO[]) => {
-        this.routes = data;
+    this.service.getRoutes(this.from, this.to, this.time).subscribe({
+      next: (data: RoutePreviewDTO) => {
+        this.routes.push(data)  
+        console.log(data);     
       },
       error: (err) => {
         console.error('Error fetching routes:', err);
       }
-    });
+    });    
   }
 
   routeDetails(busRoute: RoutePreviewDTO){
       this.router.navigate(['/routeDetails', {object: JSON.stringify(busRoute)}]);
   }
+
+  onRouteHover(route: RoutePreviewDTO): void{
+    this.higlightedRoute = route.coordinates;
+  }
+
+
 }

@@ -75,6 +75,7 @@ namespace PublicTransportNavigator.Repositories
                         Id = b.Id,
                         Name = fav.Name,
                     })
+                .OrderBy(bs=> bs.Name.Length)
                 .ToListAsync();
             return result.Count < 5 ? result : result[..5];
         }

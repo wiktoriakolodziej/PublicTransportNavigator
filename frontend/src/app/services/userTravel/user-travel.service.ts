@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { apiUrl } from '../../app.config';
 import { UserTravelCreateDTO } from '../../models/user-travel-create';
 import { RoutePreviewDTO } from '../../models/route-preview';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TimetableService } from '../timetable/timetable.service';
 
 @Injectable({
@@ -20,7 +20,9 @@ export class UserTravelService {
   }
 
   getHistoryPreview(userId: number) : Observable<RoutePreviewDTO[]>{
-      return this.timetableService.getRoutes("domi", "domi", "now");
+      let test : RoutePreviewDTO[] = [];
+      return of(test);//this.timetableService.getRoutes(1, 12, "now");
+      
   }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { apiUrl } from '../../app.config';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { RoutePreviewDTO } from '../../models/route-preview';
 import { Observable, of } from 'rxjs';
 import { RouteDetailsDTO } from '../../models/route-details';
@@ -14,33 +14,13 @@ export class TimetableService {
 
   constructor(private http: HttpClient) { }
 
-  getRoutes(from: string, to: string, date: string): Observable<RoutePreviewDTO[]> {
-    // return this.http.get<RoutePreviewDTO[]>(`${this.baseUrl}/timetable/routes`, {
-    //   params: { from, to, date }
-    // });
-    const mockRoutes: RoutePreviewDTO[] = [
-      {
-        id: 1,
-        timeIn: new Date('2024-10-16T08:30:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timeOut: new Date('2024-10-16T09:00:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        buses: [
-          { id: 1, number: 'Bus A' },
-          { id: 2, number: 'Bus B' }
-        ]
-      },
-      {
-        id: 2,
-        timeIn: new Date('2024-10-17T10:00:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timeOut: new Date('2024-10-17T10:30:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        buses: [
-          { id: 3, number: 'Bus C' },
-          { id: 4, number: 'Bus D' }
-        ]
-      }
-    ];
+  getRoutes(from: number, to: number, time: string): Observable<RoutePreviewDTO> {
+    const params = new HttpParams()
+      .set('sourceBusStopId', from)        
+      .set('destinationBusStopId', to)       
+      .set('departureTime', time);           
 
-    // Return the mock data as an observable
-    return of(mockRoutes);
+    return this.http.get<RoutePreviewDTO>(`${this.baseUrl}/Timetables/path`, { params });
 
   }
 

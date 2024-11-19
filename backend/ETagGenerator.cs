@@ -16,5 +16,6 @@ namespace PublicTransportNavigator
             var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(entity!.LastModified.ToString()));
             return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
         }
+
     }
 }

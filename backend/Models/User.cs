@@ -24,6 +24,11 @@ namespace PublicTransportNavigator.Models
         [Column("role")]
         public Role Role { get; set; } = Role.User;
 
+        [Required]
+        [MaxLength(60)]
+        [Column("password")]
+        public required string Password { get; set; }
+
         [Column("profile_picture")]
         public byte[]? ImageData { get; set; }
         public List<UserFavouriteBusStop>? Favourites { get; set; }
