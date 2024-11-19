@@ -39,8 +39,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("last_bus_stop_id");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Number")
@@ -74,8 +73,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("bus_id");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Position")
@@ -114,8 +112,7 @@ namespace PublicTransportNavigator.Migrations
                         .IsRequired()
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -147,8 +144,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Percentage")
@@ -177,8 +173,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("reservation_date");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("TimeInId")
@@ -219,8 +214,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("icon");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SeatType")
@@ -242,8 +236,7 @@ namespace PublicTransportNavigator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<float>("Price")
@@ -276,8 +269,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("bus_stop_id");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Time")
@@ -306,8 +298,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("profile_picture");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -315,6 +306,12 @@ namespace PublicTransportNavigator.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("password");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -345,8 +342,7 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("bus_stop_id");
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -376,8 +372,7 @@ namespace PublicTransportNavigator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime?>("LastModified")
-                        .IsRequired()
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("TicketId")

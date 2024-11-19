@@ -40,55 +40,55 @@ export class BusStopService {
 
   getAll() : Observable<BusStopDTO[] | null>{
 
-    // const etag: string = `busStopsETag`;
-    // const data: string = `busStops`;
-    // const headers = localStorage.getItem(etag) ? new HttpHeaders({ 'If-None-Match': localStorage.getItem(etag)! }) : undefined;
+    const etag: string = `busStopsETag`;
+    const data: string = `busStops`;
+    const headers = localStorage.getItem(etag) ? new HttpHeaders({ 'If-None-Match': localStorage.getItem(etag)! }) : undefined;
 
-    // return this.http.get<BusStopDTO[]>(`${this.baseUrl}/${this.serviceUrl}`, { headers, observe: 'response' }).pipe(
-    //   tap(response => {
-    //     if (response.status === 200) { 
-    //       localStorage.setItem(data, JSON.stringify(response.body));
-    //       const newEtag = response.headers.get(this.eTag);
-    //       if (newEtag) {
-    //         localStorage.setItem(etag, newEtag); // Cache ETag
-    //       }
-    //     }
-    //   }),
-    //   map(response => response.status === 304 ? JSON.parse(localStorage.getItem(data)!) as BusStopDTO[] : response.body)
-    // );
+    return this.http.get<BusStopDTO[]>(`${this.baseUrl}/${this.serviceUrl}`, { headers, observe: 'response' }).pipe(
+      tap(response => {
+        if (response.status === 200) { 
+          localStorage.setItem(data, JSON.stringify(response.body));
+          const newEtag = response.headers.get(this.eTag);
+          if (newEtag) {
+            localStorage.setItem(etag, newEtag); // Cache ETag
+          }
+        }
+      }),
+      map(response => response.status === 304 ? JSON.parse(localStorage.getItem(data)!) as BusStopDTO[] : response.body)
+    );
 
-    let result : BusStopDTO[] = [
-      {
-        id: 1,
-        name: "domi",
-        coordX: 1,
-        coordY: 1,
-        onRequest: true,
-      },
-      {
-        id: 2,
-        name: "domi4",
-        coordX: 1,
-        coordY: 1,
-        onRequest: true,
-      },
-      {
-        id: 3,
-        name: "domi3",
-        coordX: 1,
-        coordY: 1,
-        onRequest: true,
-      },
-      {
-        id: 4,
-        name: "domi4",
-        coordX: 1,
-        coordY: 1,
-        onRequest: true,
-      }
-    ]
+    // let result : BusStopDTO[] = [
+    //   {
+    //     id: 1,
+    //     name: "domi",
+    //     coordX: 1,
+    //     coordY: 1,
+    //     onRequest: true,
+    //   },
+    //   {
+    //     id: 2,
+    //     name: "domi4",
+    //     coordX: 1,
+    //     coordY: 1,
+    //     onRequest: true,
+    //   },
+    //   {
+    //     id: 3,
+    //     name: "domi3",
+    //     coordX: 1,
+    //     coordY: 1,
+    //     onRequest: true,
+    //   },
+    //   {
+    //     id: 4,
+    //     name: "domi4",
+    //     coordX: 1,
+    //     coordY: 1,
+    //     onRequest: true,
+    //   }
+    // ]
 
-    return of(result);
+    // return of(result);
   }
 
   getTimetables(busStopId: number) : Observable<BusStopDetailsDTO | null>{
@@ -149,12 +149,10 @@ export class BusStopService {
   }
 
   getNamesByFragment(fragment: string) : Observable<BusStopDTO[]>{
-    var user = JSON.parse(localStorage.getItem('userData')!) as UserInfo;
-    let params = new HttpParams();
 
-    if (user?.id) {
-      params = params.set('userId', user.id);
-    }
+    var user = JSON.parse(localStorage.getItem('userData')!) as UserInfo | null;
+    const params = user != null ? new HttpParams().set('userId', user.id) : new HttpParams();
+
     var result =  this.http.get<BusStopDTO[]>(`${this.baseUrl}/${this.serviceUrl}/fragment/${fragment}`, {params});
     return result;
     

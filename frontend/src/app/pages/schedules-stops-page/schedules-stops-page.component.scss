@@ -3,6 +3,7 @@ app-schedules-footer {
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 1; /* Ensure it stays above other elements */
   }
 
 app-header {
@@ -10,6 +11,7 @@ app-header {
     top: 0;
     z-index: 1; /* Ensure it stays above other elements */
 }
+
 
 .mat-card{
   display: flex;
@@ -21,6 +23,7 @@ app-header {
   margin-right: 10%;
   margin-left: 10%;
   border: transparent;
+  overflow: hidden;
 
 }
 
@@ -28,6 +31,9 @@ app-header {
   cursor:pointer; 
   display: flex;
   align-items: baseline;
+  min-height: fit-content;
+  white-space: nowrap;
+  
 }
 
 #name{
@@ -36,5 +42,18 @@ app-header {
 
 #on-request{
   font-size: 1rem;
-  margin-left: 5px;
+  margin-left: 4%;
+}
+
+.scrolling-text {
+  animation: scroll-left 10s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%); /* Start from the right side */
+  }
+  100% {
+    transform: translateX(-100%); /* Move to the left side */
+  }
 }

@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { BusStopDTO } from '../../models/bus-stop';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { CoordinateDTO } from '../../models/coordinateDTO';
 
 @Component({
   selector: 'app-map',
@@ -11,21 +12,27 @@ import { filter } from 'rxjs';
   styles: [],
   imports: [GoogleMapsModule],
 })
-export class MapComponent implements AfterViewInit  {
+export class MapComponent implements AfterViewInit, OnChanges  {
   private map: google.maps.Map | null = null;
-  private directionsRenderer: google.maps.DirectionsRenderer | null = null;
+  private markers: google.maps.Marker[] = []; // Keep track of markers
 
-  private busStops: BusStopDTO[] = [
-    { id: 2, name: 'M1', coordX: 50.2877, coordY: 18.6767, onRequest: false },
-    //{ id: 1, name: 'M1', coordX: 50.295472, coordY: 18.66894, onRequest: false },
-    //{ id: 1, name: 'M1', coordX: 50.295472, coordY: 18.66894, onRequest: false },
-    { id: 3, name: 'M1', coordX: 50.2984, coordY:  18.6776, onRequest: false },
-    // Add more bus stops as needed
-  ];
+  @Input() coordinates!: CoordinateDTO[];
 
   constructor(private router: Router) {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['coordinates'] && this.map) {
+      this.updateMarkers();
+      console.log("update coords:" + this.coordinates);
+      
+      
+    }
+  }
 
   ngAfterViewInit() {
+    // this.coordinates = [
+    //   { x: 37.7749, y: -122.4194 }, // San Francisco
+    //   { x: 34.0522, y: -118.2437 }, // Los Angeles
+    // ];
     setTimeout(() => {
       this.initializeMap();
     }, 0);
@@ -41,52 +48,43 @@ export class MapComponent implements AfterViewInit  {
 
   private initializeMap() {
     const mapContainer = document.getElementById('map');
-    if (mapContainer) {
-      this.map = new google.maps.Map(mapContainer as HTMLElement, {
-        center: { lat: this.busStops[0].coordX!, lng: this.busStops[0].coordY! }, // Center map on the first bus stop
-        zoom: 14,
-      });
-      console.log("Map initialized");
+    if (!mapContainer) {
+      console.error('Map container not found');
+      return;
+    }
 
-      // Initialize directions renderer
-      this.directionsRenderer = new google.maps.DirectionsRenderer({
-        map: this.map,
-        suppressMarkers: true, // Suppress default markers
-        polylineOptions: {
-          strokeColor: '#FF0000', // Color of the route
-          strokeOpacity: 1.0,
-          strokeWeight: 2,
-        },
-      });
+    // Initialize the map
+    this.map = new google.maps.Map(mapContainer, {
+      center: { lat: 0, lng: 0 }, // Default center
+      zoom: 8,                    // Default zoom level
+    });
 
-      this.drawRoute();
+    // Add initial markers if coordinates are provided
+    if (this.coordinates && this.coordinates.length > 0) {
+      this.updateMarkers();
     }
   }
 
-  private drawRoute() {
-    if (!this.map || !this.directionsRenderer) return;
+  private updateMarkers() {
+    // Clear existing markers
+    this.markers.forEach(marker => marker.setMap(null));
+    this.markers = [];
 
-    const directionsService = new google.maps.DirectionsService();
+    if (this.coordinates && this.coordinates.length > 0) {
+      // Add new markers for the provided coordinates
+      this.coordinates.forEach(coord => {
+        const marker = new google.maps.Marker({
+          position: { lat: coord.x, lng: coord.y },
+          map: this.map!,
+        });
+        this.markers.push(marker);
+      });
 
-    // Set the start and end points
-    const start = new google.maps.LatLng(this.busStops[0].coordX!, this.busStops[0].coordY!);
-    const end = new google.maps.LatLng(this.busStops[this.busStops.length - 1].coordX!, this.busStops[this.busStops.length - 1].coordY!);
-
-    // Define the request for directions
-    const request = {
-      origin: start,
-      destination: end,
-      travelMode: google.maps.TravelMode.TRANSIT, // Travel mode
-    };
-
-    // Get the directions
-    directionsService.route(request, (result, status) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        this.directionsRenderer?.setDirections(result);
-      } else {
-        console.error('Directions request failed due to ' + status);
-      }
-    });
+      // Adjust the map's bounds to fit all markers
+      const bounds = new google.maps.LatLngBounds();
+      this.coordinates.forEach(coord => bounds.extend({ lat: coord.x, lng: coord.y }));
+      this.map!.fitBounds(bounds);
+    }
   }
 
 }

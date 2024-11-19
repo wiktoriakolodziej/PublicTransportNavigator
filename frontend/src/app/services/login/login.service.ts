@@ -10,52 +10,12 @@ import { LoginResponseDTO } from '../../models/login-response';
 export class LoginService {
 
   private baseUrl = apiUrl;
-  private serviceUrl = "Login";
-  private isLoggedInSubject = new BehaviorSubject<boolean>(false); 
-  isLoggedIn$: Observable<boolean> = this.isLoggedInSubject.asObservable();
+  private serviceUrl = "Auth";
 
   constructor(private http: HttpClient) { }
 
-  login(loginData: {username : string, password: string}) :Observable<LoginResponseDTO>{
-    //return this.http.post(`${this.baseUrl}/${this.serviceUrl}`, loginData);
-    let response: LoginResponseDTO = {
-      token: "kfjskdfs",
-      user: {
-        id: 1,
-        name: "domi",
-        surname: "domi",
-        favouriteBusStops: [
-          {
-            id: 1,
-            name: "busstop1",
-            userName: "home",
-          },
-          {
-            id: 2,
-            name: "busstop2",
-            userName: "school",
-          }
-        ],
-        discounts: [
-          {
-            id: 1,
-            description: "only for students below 26 years old",
-            name: "student",
-            percent: 50,
-          },
-          {
-            id: 2,
-            description: "for travelers before 1pm",
-            name: "early bird",
-            percent: 10,
-          }
-        ]
-      },
-      expirationTime: 30000,
-    }
-    localStorage.setItem('userData', JSON.stringify(response.user)); 
-    this.isLoggedInSubject.next(true);
-    return of(response);
+  login(loginData: {Login : string, Password: string}) :Observable<LoginResponseDTO>{
+    return this.http.post<LoginResponseDTO>(`${this.baseUrl}/${this.serviceUrl}/login`, loginData);
   }
 
   checkLoginStatus() : boolean{
@@ -64,8 +24,8 @@ export class LoginService {
   }
 
   logout() {
-    this.isLoggedInSubject.next(false);
     localStorage.removeItem('userData');
+    localStorage.removeItem('token');
   }
 
 }

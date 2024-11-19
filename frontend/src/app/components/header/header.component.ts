@@ -75,7 +75,7 @@ export class HeaderComponent {
 export class LoginDialog {
   readonly dialogRef = inject(MatDialogRef<LoginDialog>);
   hide = signal(true);
-  loginData = { username: '', password: ''};
+  loginData = { Login: '', Password: ''};
   constructor(private loginService: LoginService, private router: Router){}
 
   clickEvent(event: MouseEvent) {
@@ -86,7 +86,8 @@ export class LoginDialog {
     
     this.loginService.login(this.loginData).subscribe(
       (response: LoginResponseDTO) => {
-        localStorage.setItem('token', response.token); // Store the JWT token
+        localStorage.setItem('userData', JSON.stringify(response.user)); 
+        localStorage.setItem('token', response!.token); // Store the JWT token
         console.log('Login successful');
         this.router.navigate(['/account']);
       },

@@ -9,7 +9,7 @@
                   </div>
                   <div class="element">
                     @for(route of routes; track route){
-                      <button (click)="routeDetails(route)" class="routeButton">
+                      <button (click)="routeDetails(route)" class="routeButton" (mouseover)="onRouteHover(route)">
                         <app-route-preview [copy]="route"></app-route-preview>
                       </button>
                     }
@@ -24,7 +24,7 @@
           </div>
 
           <div class="map-container">
-            <app-map class="map"></app-map>
+            <app-map class="map" [coordinates]="higlightedRoute"></app-map>
           </div>
   </div>
 </div>

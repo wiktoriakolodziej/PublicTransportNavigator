@@ -14,7 +14,7 @@
                         (input)="filter('from')"
                         (focus)="filter('from')">
                   <mat-autocomplete requireSelection #autoFrom="matAutocomplete">
-                    @for (option of filteredFromOptions; track option) {
+                    @for (option of filteredFromValues; track option) {
                       <mat-option [value]="option">{{option}}</mat-option>
                     }
                   </mat-autocomplete>
@@ -35,7 +35,7 @@
                           (focus)="filter('to')"
                           >
                     <mat-autocomplete requireSelection #autoTo="matAutocomplete">
-                      @for (option of filteredToOptions; track option) {
+                      @for (option of filteredToValues; track option) {
                         <mat-option [value]="option">{{option}}</mat-option>
                       }
                     </mat-autocomplete>
@@ -54,6 +54,10 @@
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
       </div>
+      <mat-form-field class="example-full-width">
+        <mat-label>Time</mat-label>
+        <input matInput [(ngModel)]="timeValue">
+      </mat-form-field>
       <div class="element">
                 <button class="button" mat-raised-button [disabled]="!isFormComplete()" (click)="searchRoutes()">Search</button>
       </div>

@@ -17,6 +17,6 @@ namespace PublicTransportNavigator.Models
 
         [Required]
         [Column("bus_arrival_time")]
-        public required DateTime Time { get; set; }
+        public required TimeSpan Time { get; set; }
     }
 }
