@@ -1,27 +1,27 @@
 <mat-card appearance="outlined" class="mat-card">
     <mat-card-content id="content">
         <mat-card  id="bus-number">
-            <mat-card-content id="bus-number-content"> {{routeDetailsDTO.timetableIn.busName}} </mat-card-content>
+            <mat-card-content id="bus-number-content"> {{part.busName}} </mat-card-content>
         </mat-card>
         <div id="rightPanel">
             <div [ngClass]="{ 'bold': shouldShowBusStops }">
-                {{routeDetailsDTO.timetableIn.time}} from: {{routeDetailsDTO.timetableIn.busStopName}}
+                {{getDetailsById(0)?.[0]}} from: {{getDetailsById(0)?.[1]}}
             </div>
             <div id="arrow">
                 @if(!shouldShowBusStops){
-                    <button mat-fab id="arrow-button" (click)="getBusStops()">
+                    <button mat-fab id="arrow-button" (click)="toggleDisplay()">
                         <mat-icon id="icon">keyboard_arrow_down</mat-icon>
                     </button>
                 }
                 @else{
                     <div id="bus-stops-display">
                         <div id="bus-stops">
-                            @for(busStop of busStops; track busStop){
-                                {{busStop.name}}
+                            @for(busStop of getDetails(); track busStop){
+                                {{busStop}}
                             }
                         </div>
                         <div id="button-bus-stops-view">
-                            <button mat-fab id="arrow-button-bus-stops-view" (click)="getBusStops()">
+                            <button mat-fab id="arrow-button-bus-stops-view" (click)="toggleDisplay()">
                                 <mat-icon id="icon">keyboard_arrow_up</mat-icon>
                             </button>
                         </div>
@@ -29,7 +29,7 @@
                 }
             </div>
             <div [ngClass]="{ 'bold': shouldShowBusStops }">
-                {{routeDetailsDTO.timetableOut.time}} to: {{routeDetailsDTO.timetableOut.busStopName}}
+                {{getDetailsById(-1)?.[0]}} to: {{getDetailsById(-1)?.[1]}}
             </div>
         </div>
     </mat-card-content>

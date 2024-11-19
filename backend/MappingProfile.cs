@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.DTOs.old;
@@ -28,6 +29,8 @@ namespace PublicTransportNavigator
             CreateMap<Timetable, TimetableDTO>();
             CreateMap<TimetableDTO, Timetable>();
             CreateMap<TimetableCreateDTO, Timetable>();
+            CreateMap<RouteDetails, RouteDetailsDTO>()
+                .ForMember(dest => dest.Parts, opt => opt.MapFrom(src => src.Parts.Values.ToList()));
         }
     }
 

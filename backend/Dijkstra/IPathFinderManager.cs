@@ -1,6 +1,4 @@
-﻿using PublicTransportNavigator.DTOs;
-
-namespace PublicTransportNavigator.Dijkstra
+﻿namespace PublicTransportNavigator.Dijkstra
 {
     public interface IPathFinderManager
     {

@@ -11,6 +11,7 @@ namespace PublicTransportNavigator.Repositories.Abstract
         Task<TimetableDTO?> GetById(long id);
         Task<IEnumerable<TimetableDTO>> GetByBusStopAndBus(int  busStopId, int busId);
         Task<RoutePreview> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime);
+        Task<RouteDetailsDTO> GetRouteDetails(string routeId);
         Task<IEnumerable<TimetableDTO>> Create(TimetableCreateDTO busDto);
         Task<TimetableDTO> Update(long id, TimetableCreateDTO bus);
         Task Delete(long id);

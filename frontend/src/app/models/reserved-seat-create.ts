@@ -1,7 +1,8 @@
 export interface ReservdSeatCreateDTO {
     busSeatId: number;
-    timetableInId: number;
-    timetableOffId: number;
+    busIdIn: number;
+    timeIn: string;
+    timeOff: string;
     userTravelId?: number;
     reservationDate: string;
   }

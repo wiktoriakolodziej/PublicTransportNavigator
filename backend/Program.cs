@@ -8,6 +8,8 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Hosting;
 using PublicTransportNavigator.Dijkstra.AStar;
+using StackExchange.Redis;
+using PublicTransportNavigator.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +45,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddSingleton<IPathFinderManager, PathFinderManager<Node>>();
+builder.Services.AddSingleton<IPathFinderManager, PathFinderManager<NodeAs>>();
 
 
 builder.Services.AddScoped<IBusRepository, BusRepository>();
@@ -52,8 +54,13 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
 builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = builder.Configuration.GetConnectionString("Redis");
+    return ConnectionMultiplexer.Connect(configuration);
+});
 
-
+builder.Services.AddScoped<RedisCacheService>();
 
 
 
@@ -74,3 +81,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+//wsl
+//user: wiktoria
+//sudo service redis-server start

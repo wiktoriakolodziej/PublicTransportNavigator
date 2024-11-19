@@ -164,7 +164,8 @@ namespace PublicTransportNavigator.Dijkstra
             _nodes.TryGetValue(destinationBusStopId, out var node);
             RouteDetails result = new()
             {
-                DestinationTime = node.BestArrivalTime
+                DestinationTime = node.BestArrivalTime,
+                Id = Guid.NewGuid().ToString(),
             };
             
             var stopNumber = destinationBusStopId;
@@ -189,20 +190,21 @@ namespace PublicTransportNavigator.Dijkstra
                         {
                             BusName = (context.Buses.FirstOrDefault(b => b.Id == busNumber)).Number,
                         };
-                        part.Details.Add($"{node.BestArrivalTime} : {busStopData.Name}");
+                        part.Details.Add(node.BestArrivalTime, busStopData.Name);
                         result.Parts.Add(busNumber.Value, part);
                         if (previousBusNumber != -1)
                         {
                             result.Parts.TryGetValue(previousBusNumber, out part);
-                            part.Details.Add($"{node.BestDepartureTime} : {busStopData.Name}");
+                            part.Details.Add(node.BestDepartureTime, busStopData.Name);
+                            part.Details = part.Details
+                                .Reverse()
+                                .ToDictionary(pair => pair.Key, pair => pair.Value);
                         }
                     }
                     else
                     {
-                        var input =
-                            $"{node.BestArrivalTime} : {busStopData.Name}";
                         result.Parts.TryGetValue(busNumber.Value, out var part);
-                        part.Details.Add(input);
+                        part.Details.Add(node.BestArrivalTime, busStopData.Name);
                         
                     }
                 }
@@ -218,10 +220,15 @@ namespace PublicTransportNavigator.Dijkstra
                 {
                     var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
                     result.Parts.TryGetValue(busNumber.Value, out var firstPart);
-                    firstPart.Details.Add($"{node.BestDepartureTime} : {(context.BusStops.FirstOrDefault(bs => bs.Id == stopNumber)).Name}");
+                    firstPart.Details.Add(node.BestDepartureTime, (context.BusStops.FirstOrDefault(bs => bs.Id == stopNumber)).Name);
+                    firstPart.Details = firstPart.Details
+                        .Reverse()
+                        .ToDictionary(pair => pair.Key, pair => pair.Value);
                 }
             }
-
+            result.Parts = result.Parts
+                .Reverse()
+                .ToDictionary(pair => pair.Key, pair => pair.Value); 
             return result;
         }
     }

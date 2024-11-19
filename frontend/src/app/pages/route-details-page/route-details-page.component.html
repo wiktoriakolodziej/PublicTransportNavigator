@@ -4,9 +4,9 @@
     <div class="sidenav"> 
         <mat-drawer-container class="example-container" autosize>
           <mat-drawer #drawer class="sidenav-content" mode="side"  [opened]=true>
-            <app-route-preview [copy]=busRoute></app-route-preview>
-            @for(details of routeDetails; track details){
-              <app-route-details [routeDetailsDTO]=details></app-route-details>
+            <app-route-preview [copy]=routePreview></app-route-preview>
+            @for(routePart of routeDetails.parts; track routePart){
+              <app-route-details [part]=routePart></app-route-details>
             }
             <div id="reserve-seat-button" [hidden]="!checkIfLoggedIn()">
               <button mat-flat-button (click)="reserveSeats()" [hidden]="!canReserveSeat">Reserve seat</button>
@@ -26,7 +26,7 @@
         <mat-card-content>
           <div id="bus-name-header">
             <mat-card appearance="outlined">
-              <mat-card-content id="bus-name">{{routeDetails[reservingForBus].timetableIn.busName}}</mat-card-content>
+              <mat-card-content id="bus-name">{{routeDetails.parts[reservingForBus].busName}}</mat-card-content>
             </mat-card>
           </div>
           <div id="image">

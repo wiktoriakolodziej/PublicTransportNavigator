@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Diagnostics;
 using PublicTransportNavigator.Dijkstra.AStar;
-using PublicTransportNavigator.DTOs;
 
 namespace PublicTransportNavigator.Dijkstra
 {

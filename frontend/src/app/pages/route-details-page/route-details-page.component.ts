@@ -37,8 +37,9 @@ import { LoginService } from '../../services/login/login.service';
   styleUrl: './route-details-page.component.scss'
 })
 export class RouteDetailsPageComponent implements OnInit {
-    busRoute!: RoutePreviewDTO;
-    routeDetails!: RouteDetailsDTO[];
+    routePreview!: RoutePreviewDTO;
+    routeDetails!: RouteDetailsDTO;
+
     isReserveSeats: boolean = false;
     seats: BusSeatDTO[]= [];
     reservingForBus: number = 0;
@@ -53,10 +54,10 @@ export class RouteDetailsPageComponent implements OnInit {
         private reservedSeatService: ReservedSeatService, private loginService : LoginService){}
   ngOnInit(): void {
     this.route.params.subscribe(params =>{
-      this.busRoute = JSON.parse(params['object']);
+      this.routePreview = JSON.parse(params['routePreview']);
     }); 
-    this.timetableService.getRouteDetails(this.busRoute.id).subscribe({
-      next: (data: RouteDetailsDTO[]) => {
+    this.timetableService.getRouteDetails(this.routePreview.id).subscribe({
+      next: (data: RouteDetailsDTO) => {
         this.routeDetails = data;
       },
       error: (err) => {
@@ -64,14 +65,13 @@ export class RouteDetailsPageComponent implements OnInit {
       }
     });
     console.log(this.routeDetails);
-    this.routeDetails = this.routeDetails.concat(this.routeDetails);
-    this.nextOrFinishButtonLabel = this.routeDetails.length > 1 ?  "next seat" : "confirm";
+    this.nextOrFinishButtonLabel = this.routeDetails.parts.length > 1 ?  "next seat" : "confirm";
   }
 
   reserveSeats(): void{
       this.isReserveSeats = true;
       this.canReserveSeat = false;
-      this.busService.getBusSeats(this.routeDetails[this.reservingForBus].timetableIn.busId).subscribe({
+      this.busService.getBusSeats(this.routeDetails.parts[this.reservingForBus].busId).subscribe({
         next: (data: BusSeatDTO[]) =>{
           this.seats = data;
         }
@@ -99,12 +99,15 @@ export class RouteDetailsPageComponent implements OnInit {
       alert('pick up a seat first');
       return false;
     }
+    let busData = this.routeDetails.parts[this.reservingForBus];
     //create reserved seat
     let item: ReservdSeatCreateDTO = {
       busSeatId: this.chosenSeat.id,
-      timetableInId: this.routeDetails[this.reservingForBus].timetableIn.id,
-      timetableOffId: this.routeDetails[this.reservingForBus].timetableOut.id,
-      reservationDate: this.routeDetails[this.reservingForBus].date
+      busIdIn: busData.busId,
+      timeIn: Object.keys(busData.details)[0],
+      timeOff: Object.keys(busData.details)[Object.keys(busData.details).length - 1],
+      reservationDate: localStorage.getItem("selectedDate")!,
+
     }
     this.reservedSeatService.createReservedSeat(item).subscribe({
       next: (data: ReservedSeatDTO) =>{
@@ -115,10 +118,10 @@ export class RouteDetailsPageComponent implements OnInit {
     })
 
     this.reservingForBus++;
-    if(this.routeDetails.length == this.reservingForBus + 1){
+    if(this.routeDetails.parts.length == this.reservingForBus + 1){
       this.nextOrFinishButtonLabel = "confirm";
     }
-    this.busService.getBusSeats(this.routeDetails[this.reservingForBus].timetableIn.busId).subscribe({
+    this.busService.getBusSeats(busData.busId).subscribe({
       next: (data: BusSeatDTO[]) =>{
         this.seats = data;
       }
@@ -133,12 +136,14 @@ export class RouteDetailsPageComponent implements OnInit {
         alert('pick up a seat first');
         return;
       }
+      let busData = this.routeDetails.parts[this.reservingForBus];
     //create reserved seat
     let item: ReservdSeatCreateDTO = {
       busSeatId: this.chosenSeat.id,
-      timetableInId: this.routeDetails[this.reservingForBus].timetableIn.id,
-      timetableOffId: this.routeDetails[this.reservingForBus].timetableOut.id,
-      reservationDate: this.routeDetails[this.reservingForBus].date
+      busIdIn: busData.busId,
+      timeIn: Object.keys(busData.details)[0],
+      timeOff: Object.keys(busData.details)[Object.keys(busData.details).length - 1],
+      reservationDate: localStorage.getItem("selectedDate")!,
     }
     this.reservedSeatService.createReservedSeat(item);
     if(!this.reservedSeatService.confirmReservation(this.travelId!)){
