@@ -6,6 +6,7 @@ namespace PublicTransportNavigator.DTOs.Create
     {
         public long UserId { get; set; }
         public long BusStopId { get; set; }
-       
+        public string? Name { get; set; }
+
     }
 }

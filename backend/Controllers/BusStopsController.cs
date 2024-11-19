@@ -59,7 +59,7 @@ namespace PublicTransportNavigator.Controllers
         }
 
         [HttpGet("favourites/{userId}")]
-        public async Task<IActionResult> GetByFragment(long userId)
+        public async Task<IActionResult> GetFavourites(long userId)
         {
             var result = await _busStopRepository.GetFavourites(userId);
             return Ok(result);

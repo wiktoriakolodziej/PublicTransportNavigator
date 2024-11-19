@@ -23,11 +23,15 @@ namespace PublicTransportNavigator
             CreateMap<UserFavouriteBusStop, UserFavouriteBusStopDTO>();
             CreateMap<UserFavouriteBusStopDTO, UserFavouriteBusStop>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>();
             CreateMap<Timetable, TimetableDTO>();
             CreateMap<TimetableDTO, Timetable>();
             CreateMap<TimetableCreateDTO, Timetable>();
+
+            CreateMap<UserFavouriteBusStopCreateDTO, UserFavouriteBusStop>();
+
         }
     }
 

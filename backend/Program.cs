@@ -48,14 +48,10 @@ builder.Services.AddSingleton<IPathFinderManager, PathFinderManager<Node>>();
 
 builder.Services.AddScoped<IBusRepository, BusRepository>();
 builder.Services.AddScoped<IBusStopRepository, BusStopRepository>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
 builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
-
-
-
-
-
 
 
 var app = builder.Build();
