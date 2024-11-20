@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { HeaderComponent } from '../../components/header/header.component';
 import { SearchBoxComponent } from '../../components/search-box/search-box.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,7 +24,7 @@ import { CoordinateDTO } from '../../models/coordinateDTO';
   templateUrl: './search-page.component.html',
   styleUrl: './search-page.component.scss'
 })
-export class SearchPageComponent implements OnInit {
+export class SearchPageComponent implements OnInit, AfterViewInit  {
 
   showFiller = false;
   from: number = -1;
@@ -37,6 +37,10 @@ export class SearchPageComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private service: TimetableService, private router: Router) {}
 
+  ngAfterViewInit(): void {
+    this.onRouteHover(this.routes[0]);
+  }
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.from = params['from'];
@@ -45,16 +49,13 @@ export class SearchPageComponent implements OnInit {
       this.date = params['date'];
     });
     this.getRoutes();
-    console.log("highlighted route before: " + this.higlightedRoute);
-    this.higlightedRoute = this.routes[0].coordinates;
-    console.log("highlighted route: " + this.higlightedRoute);
   }
 
   getRoutes() {
     this.service.getRoutes(this.from, this.to, this.time).subscribe({
       next: (data: RoutePreviewDTO) => {
-        this.routes.push(data)  
-        console.log(data);     
+        this.routes.push(data);
+        this.higlightedRoute = data.coordinates;   
       },
       error: (err) => {
         console.error('Error fetching routes:', err);
@@ -63,7 +64,7 @@ export class SearchPageComponent implements OnInit {
   }
 
   routeDetails(busRoute: RoutePreviewDTO){
-      this.router.navigate(['/routeDetails', {object: JSON.stringify(busRoute)}]);
+      this.router.navigate(['/routeDetails', {routePreview: JSON.stringify(busRoute)}]);
   }
 
   onRouteHover(route: RoutePreviewDTO): void{

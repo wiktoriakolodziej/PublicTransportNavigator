@@ -70,6 +70,20 @@ namespace PublicTransportNavigator.Controllers
             return Ok(result);
         }
 
+        [HttpGet("path/details/{pathId}")]
+        public async Task<IActionResult> GetPathDetails(string pathId)
+        {
+            try
+            {
+                var result = await _repository.GetRouteDetails(pathId);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TimetableCreateDTO? dto)
         {

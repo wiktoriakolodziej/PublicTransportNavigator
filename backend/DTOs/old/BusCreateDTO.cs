@@ -6,7 +6,7 @@ namespace PublicTransportNavigator.DTOs.old
     public class BusCreateDTO
     {
         [Required]
-        public required BusType Type { get; set; }
+        public required long TypeId { get; set; }
 
         [Required]
         public required int Number { get; set; }

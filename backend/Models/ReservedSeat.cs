@@ -27,5 +27,6 @@ namespace PublicTransportNavigator.Models
         [Column("reservation_date")]
         [Required]
         public required DateTime Date { get; set; }
+
     }
 }

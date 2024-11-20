@@ -17,7 +17,7 @@ namespace PublicTransportNavigator.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -46,16 +46,17 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("bus_number");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("type");
+                    b.Property<long>("TypeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("bus_type_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FirstBusStopId");
 
                     b.HasIndex("LastBusStopId");
+
+                    b.HasIndex("TypeId");
 
                     b.ToTable("buses");
                 });
@@ -128,6 +129,33 @@ namespace PublicTransportNavigator.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("bus_stops");
+                });
+
+            modelBuilder.Entity("PublicTransportNavigator.Models.BusType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("bus_types");
                 });
 
             modelBuilder.Entity("PublicTransportNavigator.Models.Discount", b =>
@@ -272,8 +300,8 @@ namespace PublicTransportNavigator.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<TimeSpan>("Time")
+                        .HasColumnType("interval")
                         .HasColumnName("bus_arrival_time");
 
                     b.HasKey("Id");
@@ -421,9 +449,17 @@ namespace PublicTransportNavigator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PublicTransportNavigator.Models.BusType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("FirstBusStop");
 
                     b.Navigation("LastBusStop");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("PublicTransportNavigator.Models.BusSeat", b =>

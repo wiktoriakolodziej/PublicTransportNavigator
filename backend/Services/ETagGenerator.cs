@@ -2,9 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PublicTransportNavigator
+namespace PublicTransportNavigator.Services
 {
-    public class ETagGenerator<T>(PublicTransportNavigatorContext context) where T :BaseEntity
+    public class ETagGenerator<T>(PublicTransportNavigatorContext context) where T : BaseEntity
     {
         private readonly PublicTransportNavigatorContext _context = context;
         public string GenerateEtag(long id)

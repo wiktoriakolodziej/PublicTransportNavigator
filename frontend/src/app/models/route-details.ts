@@ -1,8 +1,11 @@
-import { TimetableDTO } from "./timetable";
+import { CoordinateDTO } from "./coordinateDTO";
+import { PartDTO } from "./part";
 
 export interface RouteDetailsDTO {
-    id: number;
-    timetableIn: TimetableDTO;
-    timetableOut: TimetableDTO;
-    date: string;
+    id: string;
+    departureTime: string;
+    destinationTime: string;
+    travelTime: number,
+    parts: PartDTO[],
+    coordinates: CoordinateDTO[]
   }

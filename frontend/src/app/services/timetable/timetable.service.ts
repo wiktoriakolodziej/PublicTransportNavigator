@@ -11,6 +11,7 @@ import { BusStopDTO } from '../../models/bus-stop';
 })
 export class TimetableService {
   private baseUrl = apiUrl;
+  private serviceUrl = "Timetables";
 
   constructor(private http: HttpClient) { }
 
@@ -20,91 +21,13 @@ export class TimetableService {
       .set('destinationBusStopId', to)       
       .set('departureTime', time);           
 
-    return this.http.get<RoutePreviewDTO>(`${this.baseUrl}/Timetables/path`, { params });
+    return this.http.get<RoutePreviewDTO>(`${this.baseUrl}/${this.serviceUrl}/path`, { params });
 
   }
 
-  getRouteDetails(id: number) : Observable<RouteDetailsDTO[]>{
-    const mockRoutes: RouteDetailsDTO[] = [
-      {
-        id: 1,
-        timetableIn: 
-          {
-            id: 1,
-            busId: 1,
-            busName: "Bus A",
-            busStopId: 1,
-            busStopName: "Domi1",
-            time: new Date('2024-10-16T08:30:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-          timetableOut: 
-            {
-              id: 2,
-              busId: 1,
-              busName: "Bus A",
-              busStopId: 2,
-              busStopName: "Domi2",
-              time: new Date('2024-10-16T08:45:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            },
-          date: new Date('2024-10-16').toString(),
-      },
-      {
-        id: 2,
-        timetableIn: 
-          {
-            id: 3,
-            busId: 2,
-            busName: "Bus B",
-            busStopId: 2,
-            busStopName: "Domi2",
-            time: new Date('2024-10-16T08:50:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-          timetableOut: 
-            {
-              id: 4,
-              busId: 2,
-              busName: "Bus B",
-              busStopId: 3,
-              busStopName: "Domi3",
-              time: new Date('2024-10-16T09:00:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            },
-            date: new Date('2024-10-16').toString(),
-      },
-      
-
-      // {
-      //   timeIn: new Date('2024-10-16T08:30:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      //   timeOut: new Date('2024-10-16T08:45:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      //   bus: { id: 1, number: 'Bus A' },
-      //   busStopIn: {id: 1,
-      //     name: "first BusStop",
-      //     coordX: 12,
-      //     coordY: 13,
-      //     onRequest: true},
-      //   busStopOut: {id: 1,
-      //     name: "second BusStop",
-      //     coordX: 12,
-      //     coordY: 13,
-      //     onRequest: true}
-      // },
-      // {
-      //   id: 2,
-      //   timeIn: new Date('2024-10-16T08:50:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      //   timeOut: new Date('2024-10-16T09:00:00').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      //   bus: { id: 1, number: 'Bus B' },
-      //   busStopIn: {id: 2,
-      //     name: "second BusStop",
-      //     coordX: 12,
-      //     coordY: 13,
-      //     onRequest: true},
-      //   busStopOut: {id: 3,
-      //     name: "third BusStop",
-      //     coordX: 12,
-      //     coordY: 13,
-      //     onRequest: true}
-      // }
-    ];
-    return of(mockRoutes);
+  getRouteDetails(id: string) : Observable<RouteDetailsDTO>{
+    return this.http.get<RouteDetailsDTO>(`${this.baseUrl}/${this.serviceUrl}/path/details/${id}`);
+  
   }
 
   getBusStops(busId: number, fromBusStopId: number, toBusStopId: number) : Observable<BusStopDTO[]>{

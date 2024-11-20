@@ -1,20 +1,26 @@
 ﻿using System.Reflection.Metadata.Ecma335;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Repositories.Abstract;
+using PublicTransportNavigator.Services;
+using StackExchange.Redis;
 
 namespace PublicTransportNavigator.Repositories
 {
-    public class TimetableRepository(PublicTransportNavigatorContext context, IMapper mapper, IPathFinderManager pathFinder) : ITimetableRepository
+    public class TimetableRepository(PublicTransportNavigatorContext context, IMapper mapper, IPathFinderManager pathFinder, RedisCacheService redisCacheService) : ITimetableRepository
     {
         private readonly PublicTransportNavigatorContext _context = context;
         private readonly IMapper _mapper = mapper;
         private readonly IPathFinderManager _pathFinder = pathFinder;
+        private readonly RedisCacheService _redisCacheService = redisCacheService;
+        private const int DefaultExpiryTime = 5;
+        private const int ExtendedExpiryTime = 10;
         public async Task<IEnumerable<TimetableDTO>> Create(TimetableCreateDTO dto)
         {
             List<TimetableDTO> result = [];
@@ -61,7 +67,18 @@ namespace PublicTransportNavigator.Repositories
         public async Task<RoutePreview> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime)
         {
             var result =  await _pathFinder.FindPath(sourceBusStopId, destinationBusStopId, departureTime);
+            var routeDetailsJson = JsonConvert.SerializeObject(result);
+            _redisCacheService.SetAsync(result.Id.ToString(), routeDetailsJson, TimeSpan.FromMinutes(DefaultExpiryTime));
             return GetPreview(result);
+        }
+
+        public async Task<RouteDetailsDTO> GetRouteDetails(string routeId)
+        {
+            var jsonString = await _redisCacheService.GetAsync(routeId);
+            if (jsonString == RedisValue.Null) throw new KeyNotFoundException($"Entity of id {routeId} was not found in the database");
+            var route = JsonConvert.DeserializeObject<RouteDetails>(jsonString);
+            _redisCacheService.ProlongKeyLifetime(routeId, TimeSpan.FromMinutes(ExtendedExpiryTime));
+            return _mapper.Map<RouteDetailsDTO>(route);
         }
 
         public async Task<TimetableDTO> Patch(long id, TimetableDTO dto)
@@ -80,11 +97,11 @@ namespace PublicTransportNavigator.Repositories
 
         private static RoutePreview GetPreview(RouteDetails details) => new RoutePreview()
         {
-            Id = 1,
+            Id = details.Id,
             DepartureTime = details.DepartureTime,
             DestinationTime = details.DestinationTime,
             TravelTime = details.TravelTime,
-            BusNumbers = details.Parts.Keys.Reverse().ToList(),
+            BusNumbers = details.Parts.Keys.ToList(),
             Coordinates = details.Coordinates,
         };
 

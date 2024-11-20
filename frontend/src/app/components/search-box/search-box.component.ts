@@ -143,6 +143,7 @@ export class SearchBoxComponent{
     const month = date.getMonth() + 1; // Get the month (0-11), so add 1 to get (1-12)
     const year = date.getFullYear(); // Get the year (YYYY)
     let formattedDate = `${day}-${month}-${year}`;
+    localStorage.setItem('selectedDate', formattedDate);
 
     const from = Object.entries(this.filteredFromOptions)
     .find(([key, value]) => value === this.fromControl.value)?.[0]; 

@@ -1,9 +1,8 @@
 ﻿namespace PublicTransportNavigator.Models.Enums
 {
-    public enum BusType
+    public enum BusTypeEnum
     {
         Articulated,
-        Short,
-        HighFloor
+        Short
     }
 }

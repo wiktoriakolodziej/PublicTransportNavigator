@@ -22,17 +22,11 @@ export class MapComponent implements AfterViewInit, OnChanges  {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['coordinates'] && this.map) {
       this.updateMarkers();
-      console.log("update coords:" + this.coordinates);
-      
-      
+      console.log("update coords:" + this.coordinates); 
     }
   }
 
   ngAfterViewInit() {
-    // this.coordinates = [
-    //   { x: 37.7749, y: -122.4194 }, // San Francisco
-    //   { x: 34.0522, y: -118.2437 }, // Los Angeles
-    // ];
     setTimeout(() => {
       this.initializeMap();
     }, 0);
