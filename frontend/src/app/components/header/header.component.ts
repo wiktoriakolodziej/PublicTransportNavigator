@@ -87,9 +87,10 @@ export class LoginDialog {
     this.loginService.login(this.loginData).subscribe(
       (response: LoginResponseDTO) => {
         localStorage.setItem('userData', JSON.stringify(response.user)); 
-        localStorage.setItem('token', response!.token); // Store the JWT token
+        localStorage.setItem('jwt', response!.token); // Store the JWT token
+        localStorage.setItem('jwt_expiration', response!.expirationTime.toString());
         console.log('Login successful');
-        this.router.navigate(['/account']);
+        this.dialogRef.close();
       },
       (error) => {
         console.log('Login failed');

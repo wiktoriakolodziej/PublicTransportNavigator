@@ -25,6 +25,7 @@ namespace PublicTransportNavigator.Repositories
             var bus = await _context.Buses
                 .Include(b => b.FirstBusStop)
                 .Include(b => b.LastBusStop)
+                .Include(b=> b.Type)
                 .FirstOrDefaultAsync(m => m.Id == id);
             return _mapper.Map<BusDTO>(bus);
         }

@@ -53,6 +53,7 @@ builder.Services.AddScoped<IBusStopRepository, BusStopRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
 builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
+builder.Services.AddScoped<IBusTypeRepository, BusTypeRepository>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -61,6 +62,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 
 builder.Services.AddScoped<RedisCacheService>();
+
 
 
 
@@ -79,6 +81,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.Run();
 

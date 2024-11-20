@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PublicTransportNavigator;
@@ -11,9 +12,11 @@ using PublicTransportNavigator;
 namespace PublicTransportNavigator.Migrations
 {
     [DbContext(typeof(PublicTransportNavigatorContext))]
-    partial class PublicTransportNavigatorContextModelSnapshot : ModelSnapshot
+    [Migration("20241120191353_proper-images")]
+    partial class properimages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

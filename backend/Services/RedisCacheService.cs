@@ -28,12 +28,7 @@ namespace PublicTransportNavigator.Services
         {
             var db = _redis.GetDatabase();
 
-            var currentTtl = await db.KeyTimeToLiveAsync(key);
-
-            if (currentTtl.HasValue)
-            {
-                await db.KeyExpireAsync(key, currentTtl.Value.Add(extension));
-            }
+            await db.KeyExpireAsync(key, extension);
         }
     }
 }

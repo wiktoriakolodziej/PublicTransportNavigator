@@ -54,16 +54,10 @@ namespace PublicTransportNavigator
                 .HasForeignKey(b => b.LastBusStopId)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Bus>()
-                .Property(b => b.Type)
-                .HasConversion<string>(); 
-            //modelBuilder.Entity<Bus>()
-            //    .HasMany(b => b.BusStops)
-            //    .WithMany(bs => bs.Buses)
-            //    .UsingEntity<Timetable>(
-            //        j => j.HasOne(t => t.BusStop).WithMany(),
-            //        j => j.HasOne(t => t.Bus).WithMany(),
-            //        j => j.HasKey(t => t.Id)
-            //    );
+                .HasOne(b => b.Type)
+                .WithMany()
+                .HasForeignKey(b => b.TypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Timetable>()
                 .HasKey(t => t.Id);
@@ -136,8 +130,13 @@ namespace PublicTransportNavigator
 
             modelBuilder.Entity<Seat>()
                 .Property(s => s.SeatType)
-                .HasConversion<string>(); 
+                .HasConversion<string>();
+
+            modelBuilder.Entity<BusType>()
+                .Property(bt => bt.Type)
+                .HasConversion<string>();
 
         }
+        public DbSet<PublicTransportNavigator.Models.BusType> BusType { get; set; } = default!;
     }
 }

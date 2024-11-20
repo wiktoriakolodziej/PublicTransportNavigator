@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using PublicTransportNavigator.Models.Enums;
 
 namespace PublicTransportNavigator.Models
 {
@@ -9,8 +8,8 @@ namespace PublicTransportNavigator.Models
     {
 
         [Required]
-        [Column("type")]
-        public required BusType Type { get; set; }
+        [Column("bus_type_id")]
+        public required long TypeId { get; set; }
 
         [Required]
         [Column("bus_number")]
@@ -28,6 +27,7 @@ namespace PublicTransportNavigator.Models
         public List<BusSeat> BusSeats { get; set; } = [];
         public BusStop? FirstBusStop { get; set; }
         public BusStop? LastBusStop { get; set; }
+        public BusType? Type { get; set; }
 
     }
 }

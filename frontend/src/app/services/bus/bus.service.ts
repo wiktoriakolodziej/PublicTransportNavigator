@@ -10,23 +10,24 @@ import { BusSeatDTO } from '../../models/bus-seat';
 })
 export class BusService {
   private baseUrl = apiUrl;
+  private serviceUrl = 'Buses';
 
   constructor(private http: HttpClient) {}
 
   getBuses() {
-    return this.http.get(`${this.baseUrl}/Buses`);
+    return this.http.get(`${this.baseUrl}/${this.serviceUrl}`);
   }
 
   getBusById(id : number){
-    return this.http.get(`${this.baseUrl}/Buses/${id}`);
+    return this.http.get(`${this.baseUrl}/${this.serviceUrl}/${id}`);
   }
 
   createBus(busCreateDto: BusCreateDTO) {
-    return this.http.post(`${this.baseUrl}/Buses`, busCreateDto);
+    return this.http.post(`${this.baseUrl}/${this.serviceUrl}`, busCreateDto);
   }
 
   deleteBus (id : number){
-    return this.http.delete(`${this.baseUrl}/Buses/${id}`)
+    return this.http.delete(`${this.baseUrl}/${this.serviceUrl}/${id}`)
   }
 
   getBusSeats(busId: number): Observable<BusSeatDTO[]>{
@@ -38,5 +39,7 @@ export class BusService {
   ];
   return of(busSeats);
   }
+
+  
 }
 

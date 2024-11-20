@@ -54,8 +54,8 @@ export class SearchPageComponent implements OnInit, AfterViewInit  {
   getRoutes() {
     this.service.getRoutes(this.from, this.to, this.time).subscribe({
       next: (data: RoutePreviewDTO) => {
-        this.routes.push(data)  
-        console.log(data);     
+        this.routes.push(data);
+        this.higlightedRoute = data.coordinates;   
       },
       error: (err) => {
         console.error('Error fetching routes:', err);

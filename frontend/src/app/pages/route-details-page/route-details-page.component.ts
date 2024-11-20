@@ -18,6 +18,9 @@ import { ReservdSeatCreateDTO } from '../../models/reserved-seat-create';
 import { ReservedSeatService } from '../../services/reservedSeat/reserved-seat.service';
 import { ReservedSeatDTO } from '../../models/reserved-seat';
 import { LoginService } from '../../services/login/login.service';
+import { BusTypeService } from '../../services/busType/bus-type.service';
+import { SafeHtml, SafeUrl } from '@angular/platform-browser';
+import { ImageService } from '../../services/image/image.service';
 
 @Component({
   selector: 'app-route-details-page',
@@ -43,7 +46,7 @@ export class RouteDetailsPageComponent implements OnInit {
     isReserveSeats: boolean = false;
     seats: BusSeatDTO[]= [];
     reservingForBus: number = 0;
-    busImage?:string;
+    busImagePath?: string;
     chosenSeat: BusSeatDTO | null = null;
     nextOrFinishButtonLabel?: string;
     canReserveSeat: boolean = true;
@@ -51,21 +54,22 @@ export class RouteDetailsPageComponent implements OnInit {
     travelId? : number;
 
     constructor(private route: ActivatedRoute, private timetableService: TimetableService, private busService: BusService,
-        private reservedSeatService: ReservedSeatService, private loginService : LoginService){}
+        private reservedSeatService: ReservedSeatService, private busTypeService: BusTypeService, private loginService : LoginService, private imagService: ImageService){}
   ngOnInit(): void {
     this.route.params.subscribe(params =>{
       this.routePreview = JSON.parse(params['routePreview']);
     }); 
+    console.log(this.routePreview);
+    
     this.timetableService.getRouteDetails(this.routePreview.id).subscribe({
       next: (data: RouteDetailsDTO) => {
         this.routeDetails = data;
+        this.nextOrFinishButtonLabel = data.parts.length > 1 ?  "next seat" : "confirm";       
       },
       error: (err) => {
         console.error('Error fetching routes:', err);
       }
     });
-    console.log(this.routeDetails);
-    this.nextOrFinishButtonLabel = this.routeDetails.parts.length > 1 ?  "next seat" : "confirm";
   }
 
   reserveSeats(): void{
@@ -75,7 +79,12 @@ export class RouteDetailsPageComponent implements OnInit {
         next: (data: BusSeatDTO[]) =>{
           this.seats = data;
         }
-      })
+      });
+      this.busTypeService.getByBusId(this.routeDetails.parts[this.reservingForBus].busId).subscribe(path => {
+        let relativePath = path.imagePath;
+        this.busImagePath = this.imagService.getImage(relativePath);
+      });
+      
   }
 
   isSeatReserved(seat: any): boolean {
@@ -100,7 +109,7 @@ export class RouteDetailsPageComponent implements OnInit {
       return false;
     }
     let busData = this.routeDetails.parts[this.reservingForBus];
-    //create reserved seat
+ 
     let item: ReservdSeatCreateDTO = {
       busSeatId: this.chosenSeat.id,
       busIdIn: busData.busId,
@@ -127,6 +136,10 @@ export class RouteDetailsPageComponent implements OnInit {
       }
     });
     this.chosenSeat = null;
+    this.busTypeService.getByBusId(this.routeDetails.parts[this.reservingForBus].busId).subscribe(path => {
+      let relativePath = path.imagePath;
+      this.busImagePath = this.imagService.getImage(relativePath);
+    });
     return true;
   }
 

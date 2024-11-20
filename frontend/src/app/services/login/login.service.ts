@@ -25,7 +25,7 @@ export class LoginService {
 
   logout() {
     localStorage.removeItem('userData');
-    localStorage.removeItem('token');
+    localStorage.removeItem('jwt');
   }
 
 }

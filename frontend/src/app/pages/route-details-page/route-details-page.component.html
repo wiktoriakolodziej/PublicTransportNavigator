@@ -30,7 +30,7 @@
             </mat-card>
           </div>
           <div id="image">
-            <img src="assets/images/busImage.jpg" id="bus-image"/>
+            <img src={{busImagePath}} id="bus-image"/>
             <button 
               class="seat"
               [style.background-color]="isSeatReserved(seat) ? 'red' : isSeatChosen(seat) ? 'blue' : 'green'"         
@@ -49,7 +49,7 @@
     </div>
 
     <div class="map-container">
-      <app-map class="map"></app-map>
+      <app-map class="map" [coordinates]="routeDetails.coordinates"></app-map>
     </div>
   </div>
  </div>
