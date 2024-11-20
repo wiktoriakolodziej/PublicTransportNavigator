@@ -50,6 +50,7 @@ builder.Services.AddSingleton<IPathFinderManager, PathFinderManager<NodeAs>>();
 
 builder.Services.AddScoped<IBusRepository, BusRepository>();
 builder.Services.AddScoped<IBusStopRepository, BusStopRepository>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
 builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
@@ -61,8 +62,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(configuration);
 });
 
-builder.Services.AddScoped<RedisCacheService>();
 
+builder.Services.AddScoped<RedisCacheService>();
 
 
 

@@ -26,11 +26,13 @@ namespace PublicTransportNavigator
             CreateMap<UserFavouriteBusStop, UserFavouriteBusStopDTO>();
             CreateMap<UserFavouriteBusStopDTO, UserFavouriteBusStop>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>();
             CreateMap<Timetable, TimetableDTO>();
             CreateMap<TimetableDTO, Timetable>();
             CreateMap<TimetableCreateDTO, Timetable>();
+
             CreateMap<BusType, BusTypeDTO>()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
 
@@ -49,6 +51,11 @@ namespace PublicTransportNavigator
                 .ForMember(dest => dest.BusId, opt => opt.MapFrom(src => 0))
                 .ForMember(dest => dest.BusName, opt => opt.MapFrom(src => src.BusName))
                 .ForMember(dest => dest.Details, opt => opt.MapFrom(src => src.Details));
+
+
+            CreateMap<UserFavouriteBusStopCreateDTO, UserFavouriteBusStop>();
+
+
         }
     }
 
