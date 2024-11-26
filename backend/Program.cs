@@ -8,8 +8,8 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Hosting;
 using PublicTransportNavigator.Dijkstra.AStar;
-using StackExchange.Redis;
 using PublicTransportNavigator.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +55,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
 builder.Services.AddScoped<IUserFavouriteBusStopRepository, UserFavouriteBusStopRepository>();
 builder.Services.AddScoped<IBusTypeRepository, BusTypeRepository>();
+builder.Services.AddScoped<IBusSeatRepository, BusSeatRepository>();
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+builder.Services.AddScoped<IReservedSeatRepository, ReservedSeatRepository>();
+builder.Services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -64,6 +68,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
 
 builder.Services.AddScoped<RedisCacheService>();
+builder.Services.AddHostedService<ReservationCleanup>();
 
 
 

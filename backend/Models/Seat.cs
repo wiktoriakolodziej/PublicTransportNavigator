@@ -12,7 +12,7 @@ namespace PublicTransportNavigator.Models
         [Column("type")]
         public required SeatType SeatType { get; set; }
 
-        [Column("icon")]
-        public byte[]? ImageData { get; set; }
+        [Column("icon_path")]
+        public string ImagePath { get; set; }
     }
 }

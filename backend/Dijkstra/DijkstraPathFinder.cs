@@ -220,7 +220,13 @@ namespace PublicTransportNavigator.Dijkstra
                 {
                     var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
                     result.Parts.TryGetValue(busNumber.Value, out var firstPart);
-                    firstPart.Details.Add(node.BestDepartureTime, (context.BusStops.FirstOrDefault(bs => bs.Id == stopNumber)).Name);
+                    var firstBusStop = context.BusStops.FirstOrDefault(bs => bs.Id == stopNumber);
+                    firstPart.Details.Add(node.BestDepartureTime, firstBusStop.Name);
+                    result.Coordinates.Add(new Coordinate
+                    {
+                        X = firstBusStop.CoordX,
+                        Y = firstBusStop.CoordY,
+                    });
                     firstPart.Details = firstPart.Details
                         .Reverse()
                         .ToDictionary(pair => pair.Key, pair => pair.Value);

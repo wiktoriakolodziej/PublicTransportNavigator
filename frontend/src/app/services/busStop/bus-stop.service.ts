@@ -56,39 +56,6 @@ export class BusStopService {
       }),
       map(response => response.status === 304 ? JSON.parse(localStorage.getItem(data)!) as BusStopDTO[] : response.body)
     );
-
-    // let result : BusStopDTO[] = [
-    //   {
-    //     id: 1,
-    //     name: "domi",
-    //     coordX: 1,
-    //     coordY: 1,
-    //     onRequest: true,
-    //   },
-    //   {
-    //     id: 2,
-    //     name: "domi4",
-    //     coordX: 1,
-    //     coordY: 1,
-    //     onRequest: true,
-    //   },
-    //   {
-    //     id: 3,
-    //     name: "domi3",
-    //     coordX: 1,
-    //     coordY: 1,
-    //     onRequest: true,
-    //   },
-    //   {
-    //     id: 4,
-    //     name: "domi4",
-    //     coordX: 1,
-    //     coordY: 1,
-    //     onRequest: true,
-    //   }
-    // ]
-
-    // return of(result);
   }
 
   getTimetables(busStopId: number) : Observable<BusStopDetailsDTO | null>{
@@ -108,44 +75,7 @@ export class BusStopService {
     //   map(response => response.status === 304 ? JSON.parse(localStorage.getItem(data)!) as BusStopDetailsDTO : response.body)
     // );
 
-    let result : BusStopDetailsDTO = {
-      id: busStopId,
-      name: "DOmi",
-      onRequest: true,
-      buses : [
-          {
-            id: 1,
-            number: "M1",
-            time: [
-              "12:45",
-              "13:45",
-              "14:45"
-            ]
-          },
-          {
-            id: 2,
-            number: "M100",
-            time: [
-              "1:45",
-              "2:45",
-              "3:45"
-            ]
-          },
-          {
-            id: 3,
-            number: "A4",
-            time: [
-              "12:45",
-              "12:55",
-              "13:05",
-              "13:15",
-              "13:25",
-              "13:35"
-            ]
-          }
-      ]
-    }
-    return of(result);
+    return this.http.get<BusStopDetailsDTO>(`${this.baseUrl}/${this.serviceUrl}/details/${busStopId}`);
   }
 
   getNamesByFragment(fragment: string) : Observable<BusStopDTO[]>{

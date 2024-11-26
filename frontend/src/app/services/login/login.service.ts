@@ -1,8 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { apiUrl } from '../../app.config';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { LoginResponseDTO } from '../../models/login-response';
+import { UserInfo } from '../../models/user-info';
+import { RegisterDTO } from '../../models/register';
+import { RegisterResponseDTO } from '../../models/register-response';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +29,20 @@ export class LoginService {
   logout() {
     localStorage.removeItem('userData');
     localStorage.removeItem('jwt');
+  }
+
+  getUserInfo(): UserInfo | null{
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) as UserInfo : null;
+  }
+
+  register(register: RegisterDTO): Observable<RegisterResponseDTO>{
+    console.log('I ma here');
+    console.log(register);
+    console.log(`${this.baseUrl}/${this.serviceUrl}/register`);
+    
+    
+    return this.http.post<RegisterResponseDTO>(`${this.baseUrl}/${this.serviceUrl}/register`, register);
   }
 
 }

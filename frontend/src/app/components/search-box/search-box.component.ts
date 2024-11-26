@@ -142,20 +142,26 @@ export class SearchBoxComponent{
     const day = date.getDate(); // Get the day (1-31)
     const month = date.getMonth() + 1; // Get the month (0-11), so add 1 to get (1-12)
     const year = date.getFullYear(); // Get the year (YYYY)
-    let formattedDate = `${day}-${month}-${year}`;
+    // Ensure month and day have two digits
+    let formattedMonth = month.toString().padStart(2, '0');
+    let formattedDay = day.toString().padStart(2, '0');
+
+    // Format the date
+    let formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
+
     localStorage.setItem('selectedDate', formattedDate);
 
     const from = Object.entries(this.filteredFromOptions)
     .find(([key, value]) => value === this.fromControl.value)?.[0]; 
     const to =  Object.entries(this.filteredToOptions)
     .find(([key, value]) => value === this.toControl.value)?.[0]; 
-
+    console.log('navigating');
     
 
-  
-    this.router.navigate(['/searchRoutes'], { 
+    this.router.navigate(['/mainPage']).then(() => {this.router.navigate(['/searchRoutes'], { 
       queryParams: {from: from, to: to,  date: formattedDate, time: this.timeValue }
-    });
+    });});
+    
   }
 }
 

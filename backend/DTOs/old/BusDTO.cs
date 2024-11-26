@@ -8,12 +8,12 @@ namespace PublicTransportNavigator.DTOs.old
     public class BusDTO
     {
         public long Id { get; set; }
-        public required string Type { get; set; }
-        public required int Number { get; set; }
-        public required long FirstBusStopId { get; set; }
-        public required long LastBusStopId { get; set; }
-        public List<Timetable> Timetables { get; } = [];
-        public List<BusSeat> BusSeats { get; } = [];
+        public string? Type { get; set; }
+        public int? Number { get; set; }
+        public  long? FirstBusStopId { get; set; }
+        public  long? LastBusStopId { get; set; }
+        public List<Timetable>? Timetables { get; } = [];
+        public List<BusSeat>? BusSeats { get; } = [];
         public BusStop? FirstBusStop { get; set; }
         public BusStop? LastBusStop { get; set; }
     }

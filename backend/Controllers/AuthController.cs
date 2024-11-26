@@ -16,6 +16,7 @@ namespace PublicTransportNavigator.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerUser)
         {
             var result = await userRepository.Register(registerUser);
+           
             return Ok(result);
         }
 

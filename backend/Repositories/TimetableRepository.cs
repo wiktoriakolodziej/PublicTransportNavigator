@@ -101,7 +101,9 @@ namespace PublicTransportNavigator.Repositories
             DepartureTime = details.DepartureTime,
             DestinationTime = details.DestinationTime,
             TravelTime = details.TravelTime,
-            BusNumbers = details.Parts.Keys.ToList(),
+            BusNumbers = details.Parts.Values
+                .Select(part => part.BusName)
+                .ToList(),
             Coordinates = details.Coordinates,
         };
 

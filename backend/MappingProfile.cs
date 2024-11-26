@@ -4,6 +4,7 @@ using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Models;
+using PublicTransportNavigator.Models.Enums;
 using PublicTransportNavigator.Services;
 
 namespace PublicTransportNavigator
@@ -54,6 +55,27 @@ namespace PublicTransportNavigator
 
 
             CreateMap<UserFavouriteBusStopCreateDTO, UserFavouriteBusStop>();
+
+            CreateMap<BusSeat, BusSeatDTO>()
+                .ForMember(dto => dto.SeatType, opt => opt.MapFrom(src => src.SeatType.SeatType.ToString()))
+                .ForMember(dto => dto.Coordinate, opt => opt.MapFrom(src => new Coordinate { X = src.CoordX, Y = src.CoordY }));
+            CreateMap<BusSeatDTO, BusSeat>()
+                .ForMember(seat => seat.CoordX, opt => opt.MapFrom(src => src.Coordinate.X))
+                .ForMember(seat => seat.CoordY, opt => opt.MapFrom(src => src.Coordinate.Y))
+                .ForMember(seat => seat.SeatType, opt => opt.MapFrom(src => (SeatType)Enum.Parse(typeof(SeatType), src.SeatType, true)))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<SeatCreateDTO, Seat>();
+            CreateMap<Seat, SeatDTO>()
+                .ForMember(dto => dto.SeatType, opt => opt.MapFrom(src => src.SeatType.ToString()));
+
+            CreateMap<ReservedSeat, ReservedSeatDTO>()
+                .ForMember(dto => dto.Date, opt => opt.MapFrom(src => src.Date.ToString()));
+                //.ForMember(dto => dto.TimeIn, opt => opt.MapFrom(src => src.TimeIn.Time.ToString()))
+                //.ForMember(dto => dto.TimeOff, opt => opt.MapFrom(src => src.TimeOff.Time.ToString()));
+
+            CreateMap<TicketType, TicketTypeDTO>()
+                .ForMember(dto => dto.Time, opt => opt.MapFrom(src => src.Time.ToString()));
 
 
         }

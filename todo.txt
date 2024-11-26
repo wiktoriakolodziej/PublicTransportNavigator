@@ -1,0 +1,8 @@
+- fix display chosen params in search-page
+- add jwt using
+- add bus page component
+- add buses data import
+- add user history
+*
+- search more routes
+- use etags

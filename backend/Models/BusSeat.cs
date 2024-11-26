@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PublicTransportNavigator.Models
@@ -18,9 +17,17 @@ namespace PublicTransportNavigator.Models
         public required long SeatTypeId { get; set; }
         public Seat? SeatType { get; set; }
 
-        [MaxLength(10)]
-        [DefaultValue("standing")]
-        [Column("seat_position")]
-        public string Position { get; set; } = "standing";
+        //[MaxLength(10)]
+        //[DefaultValue("standing")]
+        //[Column("seat_position")]
+        //public string Position { get; set; } = "standing";
+
+        [Required]
+        [Column("x_offset")]
+        public float? CoordX { get; set; }
+
+        [Required]
+        [Column("y_offset")]
+        public float? CoordY { get; set; }
     }
 }

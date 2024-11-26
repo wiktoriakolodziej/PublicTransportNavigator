@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BusCreateDTO } from '../../models/bus-create-dto';
 import { apiUrl } from '../../app.config';
 import { Observable, of } from 'rxjs';
 import { BusSeatDTO } from '../../models/bus-seat';
+import { BusDTO } from '../../models/bus';
 
 @Injectable({
   providedIn: 'root',
@@ -14,8 +15,10 @@ export class BusService {
 
   constructor(private http: HttpClient) {}
 
-  getBuses() {
-    return this.http.get(`${this.baseUrl}/${this.serviceUrl}`);
+  getBuses() : Observable<BusDTO[]> {
+    console.log(`${this.baseUrl}/${this.serviceUrl}`);
+    
+    return this.http.get<BusDTO[]>(`${this.baseUrl}/${this.serviceUrl}`);
   }
 
   getBusById(id : number){
@@ -30,14 +33,12 @@ export class BusService {
     return this.http.delete(`${this.baseUrl}/${this.serviceUrl}/${id}`)
   }
 
-  getBusSeats(busId: number): Observable<BusSeatDTO[]>{
-    let busSeats: BusSeatDTO[] = [
-      { id: 1, label: '1A', reserved: false, coordX: 14, coordY: 31 },
-      { id: 2, label: '1B', reserved: false, coordX: 30, coordY: 31 },
-      { id: 3, label: '2A', reserved: true, coordX: 14, coordY: 37 }, // Example reserved seat
-      { id: 4, label: '2B', reserved: false, coordX: 30, coordY: 37 }
-  ];
-  return of(busSeats);
+  getBusSeats(busId: number, timeIn: string, timeOut: string, date: string): Observable<BusSeatDTO[]>{
+    const params = new HttpParams()
+    .set('timeIn', timeIn)        
+    .set('timeOut', timeOut)       
+    .set('date', date);    
+    return this.http.get<BusSeatDTO[]>(`${this.baseUrl}/${this.serviceUrl}/seat/${busId}`, {params});
   }
 
   

@@ -52,9 +52,35 @@ namespace PublicTransportNavigator.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<BusStopDetailsDTO> GetDetails(long id)
+        public async Task<BusStopDetailsDTO> GetDetails(long id)
         {
-            throw new NotImplementedException();
+            var result = await (
+                from busStop in _context.BusStops
+                where busStop.Id == id
+                select new BusStopDetailsDTO
+                {
+                    Id = id,
+                    Name = busStop.Name,
+                    OnRequest = busStop.OnRequest,
+                    BusList = (
+                        from timetable in _context.Timetables
+                        where timetable.BusStopId == id
+                        select new BusOnBusStopDTO
+                        {
+                            Id = timetable.BusId,
+                            Number = (from bus in _context.Buses
+                                      where bus.Id == timetable.BusId
+                                      select bus.Number).First(),
+                            Time = (from t in _context.Timetables
+                                    where t.BusStopId == id && t.BusId == timetable.BusId
+                                    select
+                                        t.Time.ToString()
+                                ).ToList()
+                        }).GroupBy(b => b.Id)  // Group by BusId
+                        .Select(g => g.First()).ToList()
+                })
+                .FirstAsync();
+            return result;
         }
 
         public async Task<IEnumerable<BusStopDTO>> GetByFragment(string fragment, long? id)

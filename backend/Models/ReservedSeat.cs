@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 
 namespace PublicTransportNavigator.Models
@@ -27,6 +28,9 @@ namespace PublicTransportNavigator.Models
         [Column("reservation_date")]
         [Required]
         public required DateTime Date { get; set; }
+
+        [Column("valid_until")]
+        public DateTime? ValidUntil { get; set; }
 
     }
 }

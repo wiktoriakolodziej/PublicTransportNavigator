@@ -30,6 +30,7 @@ export class SchedulesStopsPageComponent implements OnInit, AfterViewChecked{
   ngOnInit(): void {
     this.busStopsService.getAll().subscribe({
       next: (data: BusStopDTO[] | null) => {
+        console.log('bus stops ' + data);
         this.busStops = data;
       }
     });
@@ -39,7 +40,6 @@ export class SchedulesStopsPageComponent implements OnInit, AfterViewChecked{
 
     var test = this.gridList.nativeElement;
     test = 0.6 * test.clientWidth * 0.5;
-    console.log(test);
     // Wait until the view is initialized
       this.contentElements.toArray().forEach(contentElement => {
         const contentWidth = contentElement.nativeElement.clientWidth;

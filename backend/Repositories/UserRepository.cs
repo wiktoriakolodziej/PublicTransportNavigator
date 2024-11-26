@@ -56,19 +56,34 @@ namespace PublicTransportNavigator.Repositories
                 ExpirationTime = _tokenExpirationInMinutes.Value
             };
         }
-        public async Task<UserDTO> Register(RegisterUserDTO registerUser)
+        public async Task<RegisterResponseDTO> Register(RegisterUserDTO registerUser)
         {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUser.Password);
-            var user = new User
+            try
             {
-                Name = registerUser.UserName,
-                Surname = registerUser.UserSurname,
-                Password = hashedPassword,
-                LastModified = DateTime.UtcNow
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<UserDTO>(user);
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUser.Password);
+                var user = new User
+                {
+                    Name = registerUser.UserName,
+                    Surname = registerUser.UserSurname,
+                    Password = hashedPassword,
+                    LastModified = DateTime.UtcNow
+                };
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+                var response = new RegisterResponseDTO
+                {
+                    Message = "Registration successful"
+                };
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = new RegisterResponseDTO
+                {
+                    Message = "Registration failed"
+                };
+                return response;
+            }
         }
 
         private string GenerateJwtToken(User user)

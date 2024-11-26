@@ -10,24 +10,17 @@ import { ReservedSeatDTO } from '../../models/reserved-seat';
 })
 export class ReservedSeatService {
   private baseUrl = apiUrl;
-  private serviceUrl = "ReservedSeat"
+  private serviceUrl = "ReservedSeats"
 
 
   constructor(private http: HttpClient) { }
 
-  createReservedSeat(seat : ReservdSeatCreateDTO) :Observable<ReservedSeatDTO>{
+  createReservedSeat(seat : ReservdSeatCreateDTO) :Observable<ReservedSeatDTO>{    
     return this.http.post<ReservedSeatDTO>(`${this.baseUrl}/${this.serviceUrl}`, seat);
   }
 
-  confirmReservation(travelId: number): Observable<boolean>{
-    return this.http.get<boolean>(`${this.baseUrl}/${this.serviceUrl}/confirm/${travelId}`, {observe: 'response'})
-      .pipe(
-        map(response => {
-          return response.status === 200;
-        }),
-        catchError(() => {
-          return of(false);
-        })
-      );
+  confirmReservation(travelId: number): Observable<number>{
+    return this.http.get<number>(`${this.baseUrl}/${this.serviceUrl}/confirm/${travelId}`); 
   }
+
 }
