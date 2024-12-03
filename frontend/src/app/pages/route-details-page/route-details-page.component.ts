@@ -57,7 +57,6 @@ export class RouteDetailsPageComponent implements OnInit {
     constructor(private route: ActivatedRoute, private timetableService: TimetableService, private busService: BusService,
         private reservedSeatService: ReservedSeatService, private busTypeService: BusTypeService, private loginService : LoginService, private imagService: ImageService){}
   ngOnInit(): void {
-    console.log('oninit');
     
     this.route.params.subscribe(params =>{
       this.routePreview = JSON.parse(params['routePreview']);

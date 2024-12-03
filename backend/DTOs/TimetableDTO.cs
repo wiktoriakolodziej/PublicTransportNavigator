@@ -11,5 +11,6 @@ namespace PublicTransportNavigator.DTOs
         public long? BusStopId { get; set; }
         public BusStop? BusStop { get; set; }
         public string? Time { get; set; }
+        public string? Day { get; set; }
     }
 }

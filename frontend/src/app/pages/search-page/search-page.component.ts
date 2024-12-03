@@ -52,7 +52,13 @@ export class SearchPageComponent implements OnInit, AfterViewInit  {
   }
 
   getRoutes() {
-    this.service.getRoutes(this.from, this.to, this.time).subscribe({
+    let day = localStorage.getItem('dayOfWeek');
+    console.log(day);
+    
+    let dayOfWeek = day ? parseInt(day, 10) : 0;
+    console.log(dayOfWeek);
+    
+    this.service.getRoutes(this.from, this.to, this.time, dayOfWeek).subscribe({
       next: (data: RoutePreviewDTO) => {
         this.routes.push(data);
         this.higlightedRoute = data.coordinates;   

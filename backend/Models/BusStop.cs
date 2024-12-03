@@ -5,8 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PublicTransportNavigator.Models
 {
     [Table("bus_stops")]
-    public class BusStop : BaseEntity
+    public class BusStop
     {
+        [Column("id")]
+        public long Id { get; set; }
 
         [MaxLength(50)]
         [Required]
@@ -24,5 +26,10 @@ namespace PublicTransportNavigator.Models
         public float? CoordY { get; set; }
 
         public List<Timetable> Timetables { get; set; } = [];
+
+        [Required]
+        public DateTime LastModified { get; set; }
+
+        //public long SiblingId { get; set; }
     }
 }

@@ -10,5 +10,7 @@ namespace PublicTransportNavigator.DTOs.Create
         public required long BusStopId { get; set; }
 
         public required List<TimeSpan> Time { get; set; }
+
+        public required long CalendarId { get; set;}
     }
 }

@@ -13,7 +13,7 @@ namespace PublicTransportNavigator.Repositories
     {
         private readonly PublicTransportNavigatorContext _context = context;
         private readonly IMapper _mapper = mapper;
-        private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
+        //private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
         public async Task<BusStopDTO> Create(BusStopCreateDTO busStopDto)
         {
             var busStop = _mapper.Map<BusStop>(busStopDto);

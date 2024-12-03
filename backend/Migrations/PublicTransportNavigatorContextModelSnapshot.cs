@@ -32,23 +32,32 @@ namespace PublicTransportNavigator.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("FirstBusStopId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasDefaultValue(0L)
                         .HasColumnName("first_bus_stop_id");
 
                     b.Property<long>("LastBusStopId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasDefaultValue(0L)
                         .HasColumnName("last_bus_stop_id");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("integer")
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("bus_number");
 
                     b.Property<long>("TypeId")
                         .HasColumnType("bigint")
                         .HasColumnName("bus_type_id");
+
+                    b.Property<bool>("WheelchairAccessible")
+                        .HasColumnType("boolean")
+                        .HasColumnName("wheelchair_accessible");
 
                     b.HasKey("Id");
 
@@ -160,6 +169,51 @@ namespace PublicTransportNavigator.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("bus_types");
+                });
+
+            modelBuilder.Entity("PublicTransportNavigator.Models.Calendar", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Friday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("friday");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Monday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("monday");
+
+                    b.Property<bool>("Saturday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("saturday");
+
+                    b.Property<bool>("Sunday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sunday");
+
+                    b.Property<bool>("Thursday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("thursday");
+
+                    b.Property<bool>("Tuesday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("tuesday");
+
+                    b.Property<bool>("Wednesday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("wednesday");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("calendar");
                 });
 
             modelBuilder.Entity("PublicTransportNavigator.Models.Discount", b =>
@@ -306,6 +360,10 @@ namespace PublicTransportNavigator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("bus_stop_id");
 
+                    b.Property<long>("CalendarId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("calendar_id");
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -318,6 +376,8 @@ namespace PublicTransportNavigator.Migrations
                     b.HasIndex("BusId");
 
                     b.HasIndex("BusStopId");
+
+                    b.HasIndex("CalendarId");
 
                     b.ToTable("timetables");
                 });
@@ -449,13 +509,13 @@ namespace PublicTransportNavigator.Migrations
                     b.HasOne("PublicTransportNavigator.Models.BusStop", "FirstBusStop")
                         .WithMany()
                         .HasForeignKey("FirstBusStopId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("PublicTransportNavigator.Models.BusStop", "LastBusStop")
                         .WithMany()
                         .HasForeignKey("LastBusStopId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("PublicTransportNavigator.Models.BusType", "Type")
@@ -539,9 +599,17 @@ namespace PublicTransportNavigator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PublicTransportNavigator.Models.Calendar", "Calendar")
+                        .WithMany()
+                        .HasForeignKey("CalendarId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.Navigation("Bus");
 
                     b.Navigation("BusStop");
+
+                    b.Navigation("Calendar");
                 });
 
             modelBuilder.Entity("PublicTransportNavigator.Models.UserFavouriteBusStop", b =>

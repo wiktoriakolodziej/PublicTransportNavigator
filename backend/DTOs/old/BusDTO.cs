@@ -9,7 +9,7 @@ namespace PublicTransportNavigator.DTOs.old
     {
         public long Id { get; set; }
         public string? Type { get; set; }
-        public int? Number { get; set; }
+        public string? Number { get; set; }
         public  long? FirstBusStopId { get; set; }
         public  long? LastBusStopId { get; set; }
         public List<Timetable>? Timetables { get; } = [];

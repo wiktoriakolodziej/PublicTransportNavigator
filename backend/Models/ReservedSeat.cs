@@ -14,11 +14,11 @@ namespace PublicTransportNavigator.Models
         public BusSeat? BusSeat { get; set; }
 
         [Column("timetable_in_id")]
-        public required long TimeInId { get; set; }
+        public long TimeInId { get; set; }
         public Timetable? TimeIn { get; set; }
 
         [Column("timetable_off_id")]
-        public required long TimeOffId { get; set; }
+        public long TimeOffId { get; set; }
         public Timetable? TimeOff { get; set; }
 
         [Column("user_travel_id")]

@@ -148,8 +148,14 @@ export class SearchBoxComponent{
 
     // Format the date
     let formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
+    let dayOfWeek = date.getDay();
+    console.log(dayOfWeek);
+    dayOfWeek--;
+    console.log(dayOfWeek);
+    
 
     localStorage.setItem('selectedDate', formattedDate);
+    localStorage.setItem('dayOfWeek', dayOfWeek.toString());
 
     const from = Object.entries(this.filteredFromOptions)
     .find(([key, value]) => value === this.fromControl.value)?.[0]; 

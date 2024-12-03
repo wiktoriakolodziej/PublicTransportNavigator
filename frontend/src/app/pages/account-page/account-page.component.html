@@ -6,12 +6,20 @@
                 <mat-card appearance="outlined" >
                     <mat-card-content id="history">history: 
                         @for(element of history; track element){
-                            <button class="button" (click)="routeDetails(element)" class="route-details-button">
+                            <button class="button" class="route-details-button">
                                 <app-route-preview [copy]="element"></app-route-preview>
                             </button>
                         }
                     </mat-card-content>
                 </mat-card>
+                <div id="buttons">
+                    <button class="button" (click)="switchPage(-1)" class="route-details-button">
+                        previous page
+                    </button>
+                    <button class="button" (click)="switchPage(1)" class="route-details-button">
+                        next page
+                    </button>
+                </div>
             </div>
             <div id="right-column">
                 <div id="name">

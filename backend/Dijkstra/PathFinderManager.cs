@@ -16,7 +16,7 @@ namespace PublicTransportNavigator.Dijkstra
         {
             foreach (var worker in _workers)
             {
-                worker.SyncNodes();
+                worker.PrepareGraphs();
             }
         }
 
@@ -47,7 +47,7 @@ namespace PublicTransportNavigator.Dijkstra
             //return Task.CompletedTask;
         }
 
-        public async Task<RouteDetails> FindPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime)
+        public async Task<RouteDetails> FindPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, long calendarId)
         {
             var stopwatch = Stopwatch.StartNew();
             while (stopwatch.ElapsedMilliseconds < _timeoutMilliseconds)
@@ -58,9 +58,9 @@ namespace PublicTransportNavigator.Dijkstra
                         throw new Exception(
                             $"Unexpected exception in {nameof(PathFinderManager<TNode>.FindPath)}, worker was null");
                     await worker.Available;
-                    var result = worker.FindPath(sourceBusStopId, destinationBusStopId, departureTime);
+                    var result = worker.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarId);
 
-                    CleanUpNodes(worker);
+                    CleanUpNodes(worker, calendarId);
 
                     return result;
                 }
@@ -72,11 +72,11 @@ namespace PublicTransportNavigator.Dijkstra
             throw new TimeoutException($"Waiting for available worker took too long, class {nameof(PathFinderManager<TNode>)}");
         }
 
-        private void CleanUpNodes(DijkstraPathFinder<TNode> worker)
+        private void CleanUpNodes(DijkstraPathFinder<TNode> worker, long calendarId)
         {
             Task.Run(async () =>
             {
-                worker.CleanUpNodes();
+                worker.CleanUpNodes(calendarId);
                 await worker.Available;
                 _workers.Enqueue(worker);
             });

@@ -2,7 +2,13 @@
 - add jwt using
 - add bus page component
 - add buses data import
-- add user history
 *
 - search more routes
 - use etags
+
+
+zamienić id busa z route id na trip id, dodać do parametrów updatefromroutes liste matchów z trips i tam łączyć po routeid, wywoływać to w updatefromtrips 
+dokonczyc w updatefromtrips updatowanie timetabli (calendar)
+zmienić liczbę tworozynych grafów w pathfinderze
+
+zabez

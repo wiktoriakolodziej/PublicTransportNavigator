@@ -3,6 +3,7 @@ using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.DTOs.old;
+using PublicTransportNavigator.DTOs.SyncData;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Models.Enums;
 using PublicTransportNavigator.Services;
@@ -76,7 +77,8 @@ namespace PublicTransportNavigator
 
             CreateMap<TicketType, TicketTypeDTO>()
                 .ForMember(dto => dto.Time, opt => opt.MapFrom(src => src.Time.ToString()));
-
+            CreateMap<BusSyncDTO, Bus>();
+            CreateMap<TimetableSyncDTO, Timetable>();
 
         }
     }

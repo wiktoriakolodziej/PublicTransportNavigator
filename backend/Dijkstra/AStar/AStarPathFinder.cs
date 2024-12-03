@@ -7,15 +7,15 @@ namespace PublicTransportNavigator.Dijkstra.AStar
 {
     public class AStarPathFinder(IServiceScopeFactory serviceProvider) : DijkstraPathFinder<NodeAs>(serviceProvider)
     {
-        public override void SyncNodes()
+        protected override void SyncNodes(long calendarId)
         {
             Available = Task.Run(async () =>
             {
+                var nodes = new Dictionary<long, NodeAs>();
                 List<List<Timetable>> timetables;
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
-                    _nodes.Clear();
                     foreach (var busStop in context.BusStops)
                     {
                         var node = new NodeAs
@@ -32,10 +32,11 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                                 Y = busStop.CoordY,
                             }
                         };
-                        _nodes.Add(busStop.Id, (NodeAs)node);
+                        nodes.TryAdd(busStop.Id, (NodeAs)node);
                     }
 
                     timetables = await context.Timetables
+                        .Where(t => t.CalendarId == calendarId)
                         .GroupBy(t => t.BusId)
                         .Select(tim => tim.OrderBy(time => time.Time).ToList())
                         .ToListAsync();
@@ -59,7 +60,7 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                             From = busStopId,
                             BusId = busId,
                         };
-                        bestTimes.Add(times.Min(), connection);
+                        bestTimes.TryAdd(times.Min(), connection);
                     }
 
                     while (bestTimes.Count > 1)
@@ -74,18 +75,20 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                         firstConnection.ConnectionTime = (second - first).Minutes;
                         firstConnection.To = secondConnection.From;
 
-                        _nodes.TryGetValue(firstConnection.From, out var fromNode);
+                        nodes.TryGetValue(firstConnection.From, out var fromNode);
                         fromNode.Connections.Add(firstConnection);
 
-                        _nodes.TryGetValue(firstConnection.To, out var toNode);
+                        nodes.TryGetValue(firstConnection.To, out var toNode);
                         toNode.Connections.Add(firstConnection);
                     }
                 }
+                _graphs.Add(calendarId, nodes);
             });
         }
 
-        protected override void Recursive(NodeAs parentNode, long currentBusStopId, long destinationBusStopId)
+        protected override void Recursive(NodeAs parentNode, long currentBusStopId, long destinationBusStopId, long calendarId)
         {
+            var nodes = _graphs[calendarId];
             //change status of the current node; it is checked from now on
             var departureTime = parentNode.BestArrivalTime;
             parentNode.Checked = true;
@@ -93,12 +96,12 @@ namespace PublicTransportNavigator.Dijkstra.AStar
             //update all neighbours of the current node
             foreach (var connection in parentNode.Connections.Where(c => c.From == currentBusStopId))
             {
-                _nodes.TryGetValue(connection.To, out var destinationStop);
+                nodes.TryGetValue(connection.To, out var destinationStop);
                 var closestDepartureTime = FindClosestAfter(departureTime, connection.DepartureTimes);
                 if (closestDepartureTime == null) continue;
                 var aggregateTime =
                     departureTime.Add(closestDepartureTime.Value - departureTime).Add(TimeSpan.FromMinutes(connection.ConnectionTime));
-                var weight = TimeSpanToFloat(aggregateTime) + GetDistance(destinationStop.Coordinate, destinationBusStopId);
+                var weight = TimeSpanToFloat(aggregateTime) + GetDistance(destinationStop.Coordinate, destinationBusStopId, calendarId);
 
                 if (destinationStop!.BestArrivalTime <= aggregateTime) continue;
 
@@ -113,24 +116,24 @@ namespace PublicTransportNavigator.Dijkstra.AStar
             //find node with the min best time that is not yet checked
             try
             {
-                var nextNode = _nodes
+                var nextNode = nodes
                     .Where(pair => pair.Value.Checked == false)
                     .MinBy(pair => pair.Value.BestWeight);
 
                 //this means the algorithm has found the shortest path
                 if (nextNode.Key == destinationBusStopId) return;
 
-                Recursive(nextNode.Value, nextNode.Key, destinationBusStopId);
+                Recursive(nextNode.Value, nextNode.Key, destinationBusStopId, calendarId);
             }
             //that means that the algorithm has checked all the nodes and haven't found the destination node (unlikely)
             catch (Exception ex) { }
         }
 
-        public override void CleanUpNodes()
+        public override void CleanUpNodes(long calendarId)
         {
             Available = Task.Run(() =>
                 {
-                    foreach (var node in _nodes)
+                    foreach (var node in _graphs[calendarId])
                     {
                         node.Value.BestArrivalTime = TimeSpan.MaxValue;
                         node.Value.BestDepartureTime = TimeSpan.MaxValue;
@@ -143,9 +146,10 @@ namespace PublicTransportNavigator.Dijkstra.AStar
             );
         }
 
-        private double GetDistance(Coordinate c1, long destinationBusStopId)
+        private double GetDistance(Coordinate c1, long destinationBusStopId, long calendarId)
         {
-            _nodes.TryGetValue(destinationBusStopId, out var destinationNode);
+            var nodes = _graphs[calendarId];
+            nodes.TryGetValue(destinationBusStopId, out var destinationNode);
             var c2 = destinationNode.Coordinate;
             // Check if either coordinate is null or has null values
             if (c1 == null || c2 == null || !c1.X.HasValue || !c1.Y.HasValue || !c2.X.HasValue || !c2.Y.HasValue)
@@ -153,11 +157,25 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                 throw new ArgumentException("Both coordinates must have valid X and Y values.");
             }
 
-            // Calculate Euclidean distance
-            var deltaX = c1.X.Value - c2.X.Value;
-            var deltaY = c1.Y.Value - c2.Y.Value;
+            if (c1.X.Equals(c2.X) && c1.Y.Equals(c2.Y))
+            {
+                return 0;
+            }
 
-            return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+            //// Calculate Euclidean distance
+            //var deltaX = c1.X.Value - c2.X.Value;
+            //var deltaY = c1.Y.Value - c2.Y.Value;
+
+            //return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            const double R = 6371000; 
+            var dLat = (c1.X - c2.X) * Math.PI / 180; 
+            var dLon = (c1.Y - c2.Y) * Math.PI / 180;
+            var a = Math.Sin(dLat.Value / 2) * Math.Sin(dLat.Value / 2) +
+                       Math.Cos(c1.X.Value * Math.PI / 180) * Math.Cos(c2.X.Value * Math.PI / 180) *
+                       Math.Sin(dLon.Value / 2) * Math.Sin(dLon.Value / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c; 
         }
 
         private static int TimeSpanToFloat(TimeSpan time)

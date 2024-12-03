@@ -59,6 +59,7 @@ builder.Services.AddScoped<IBusSeatRepository, BusSeatRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<IReservedSeatRepository, ReservedSeatRepository>();
 builder.Services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
+builder.Services.AddScoped<IUserHistoryRepository, UserHistoryRepository>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -69,8 +70,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
 builder.Services.AddScoped<RedisCacheService>();
 builder.Services.AddHostedService<ReservationCleanup>();
-
-
+builder.Services.AddHostedService<FetchDataService>();
 
 
 var app = builder.Build();

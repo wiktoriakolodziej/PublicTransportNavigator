@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Models;
+using PublicTransportNavigator.Models.Enums;
 using PublicTransportNavigator.Repositories.Abstract;
 using PublicTransportNavigator.Services;
 using StackExchange.Redis;
@@ -21,6 +23,7 @@ namespace PublicTransportNavigator.Repositories
         private readonly RedisCacheService _redisCacheService = redisCacheService;
         private const int DefaultExpiryTime = 5;
         private const int ExtendedExpiryTime = 10;
+      
         public async Task<IEnumerable<TimetableDTO>> Create(TimetableCreateDTO dto)
         {
             List<TimetableDTO> result = [];
@@ -32,6 +35,7 @@ namespace PublicTransportNavigator.Repositories
                     BusStopId = dto.BusStopId,
                     Time = time,
                     LastModified = DateTime.UtcNow,
+                    CalendarId = dto.CalendarId
                 };
                 _context.Timetables.Add(timetable);
                 result.Add(_mapper.Map<TimetableDTO>(timetable));
@@ -64,9 +68,21 @@ namespace PublicTransportNavigator.Repositories
             return _mapper.Map<TimetableDTO>(result);
         }
 
-        public async Task<RoutePreview> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime)
+        public async Task<RoutePreview> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, int dayOfWeek)
         {
-            var result =  await _pathFinder.FindPath(sourceBusStopId, destinationBusStopId, departureTime);
+            var dayPredicate = dayOfWeek switch
+            {
+                (int)DaysOfWeekEnum.Monday => (Expression<Func<Calendar, bool>>)(c => c.Monday),
+                (int)DaysOfWeekEnum.Tuesday => c => c.Tuesday,
+                (int)DaysOfWeekEnum.Wednesday => c => c.Wednesday,
+                (int)DaysOfWeekEnum.Thursday => c => c.Thursday,
+                (int)DaysOfWeekEnum.Friday => c => c.Friday,
+                (int)DaysOfWeekEnum.Saturday => c => c.Saturday,
+                (int)DaysOfWeekEnum.Sunday => c => c.Sunday,
+                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Invalid day of the week.")
+            };
+            var calendarEntity = await _context.Calendar.FirstOrDefaultAsync(dayPredicate);
+            var result =  await _pathFinder.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarEntity!.Id);
             var routeDetailsJson = JsonConvert.SerializeObject(result);
             _redisCacheService.SetAsync(result.Id.ToString(), routeDetailsJson, TimeSpan.FromMinutes(DefaultExpiryTime));
             return GetPreview(result);

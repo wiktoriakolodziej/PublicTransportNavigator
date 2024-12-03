@@ -9,7 +9,7 @@ namespace PublicTransportNavigator.DTOs.old
         public required long TypeId { get; set; }
 
         [Required]
-        public required int Number { get; set; }
+        public required string Number { get; set; }
 
         [Required]
         public required long FirstBusStopId { get; set; }

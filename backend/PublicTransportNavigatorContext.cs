@@ -22,6 +22,7 @@ namespace PublicTransportNavigator
         public DbSet<User> Users { get; set; }
         public DbSet<UserFavouriteBusStop> UserFavouriteBusStops { get; set; }
         public DbSet<UserTravel> UserTravels { get; set; }
+        public DbSet<Calendar> Calendar { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,12 +48,18 @@ namespace PublicTransportNavigator
                 .HasOne(b => b.FirstBusStop)
                 .WithMany()
                 .HasForeignKey(b => b.FirstBusStopId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Bus>()
+                .Property(b => b.FirstBusStopId)
+                .HasDefaultValue(default(long));
             modelBuilder.Entity<Bus>()
                 .HasOne(b => b.LastBusStop)
                 .WithMany()
                 .HasForeignKey(b => b.LastBusStopId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Bus>()
+                .Property(b => b.LastBusStopId)
+                .HasDefaultValue(default(long));
             modelBuilder.Entity<Bus>()
                 .HasOne(b => b.Type)
                 .WithMany()
@@ -64,11 +71,18 @@ namespace PublicTransportNavigator
             modelBuilder.Entity<Timetable>()
                 .HasOne(t => t.Bus)
                 .WithMany(b => b.Timetables)
-                .HasForeignKey(t => t.BusId);
+                .HasForeignKey(t => t.BusId)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Timetable>()
                 .HasOne(t => t.BusStop)
                 .WithMany(bs => bs.Timetables)
-                .HasForeignKey(t => t.BusStopId);
+                .HasForeignKey(t => t.BusStopId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Timetable>()
+                .HasOne(t => t.Calendar)
+                .WithMany()
+                .HasForeignKey(t => t.CalendarId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<UserFavouriteBusStop>()
                 .HasKey(f =>  f.Id);
@@ -126,7 +140,8 @@ namespace PublicTransportNavigator
             modelBuilder.Entity<ReservedSeat>()
                 .HasOne(rs => rs.UserTravel)
                 .WithMany(ut => ut.ReservedSeats)
-                .HasForeignKey(rs => rs.UserTravelId);
+                .HasForeignKey(rs => rs.UserTravelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Seat>()
                 .Property(s => s.SeatType)

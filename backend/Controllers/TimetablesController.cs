@@ -64,9 +64,9 @@ namespace PublicTransportNavigator.Controllers
 
         [HttpGet("path")]
         public async Task<IActionResult> GetPath([FromQuery] long sourceBusStopId,
-            [FromQuery] long destinationBusStopId, [FromQuery] TimeSpan departureTime)
+            [FromQuery] long destinationBusStopId, [FromQuery] TimeSpan departureTime, [FromQuery] int day)
         {
-            var result = await repository.GetPath(sourceBusStopId, destinationBusStopId, departureTime);
+            var result = await repository.GetPath(sourceBusStopId, destinationBusStopId, departureTime, day);
             return Ok(result);
         }
 

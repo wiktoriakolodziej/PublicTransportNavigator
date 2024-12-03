@@ -21,6 +21,8 @@ import { RoutePreviewComponent } from '../../components/route-preview/route-prev
 export class AccountPageComponent implements OnInit{
     user? : UserInfo;
     history? : RoutePreviewDTO[];
+    page: number = 1;
+    pageSize : number = 2;
 
     constructor(private router: Router, private travelService: UserTravelService){
     }
@@ -30,11 +32,10 @@ export class AccountPageComponent implements OnInit{
         this.user = JSON.parse(userData) as UserInfo;
       }
       
-    this.travelService.getHistoryPreview(this.user!.id).subscribe({
+    this.travelService.getHistoryPreview(this.user!.id, this.page, this.pageSize).subscribe({
       next: (data: RoutePreviewDTO[]) => {
         this.history = data;
       }});
-
       
   }
 
@@ -42,8 +43,14 @@ export class AccountPageComponent implements OnInit{
       alert(info);
     }
 
-    routeDetails(route: RoutePreviewDTO): void{
 
+    switchPage(where : number){
+      this.page += where;
+      if(this.page < 1) this.page =1;
+      this.travelService.getHistoryPreview(this.user!.id, this.page, this.pageSize).subscribe({
+        next: (data: RoutePreviewDTO[]) => {
+          this.history = data;
+        }});
     }
 
 
