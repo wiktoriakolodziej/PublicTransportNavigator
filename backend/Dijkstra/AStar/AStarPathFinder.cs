@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.Models;
+using PublicTransportNavigator.Services;
 
 namespace PublicTransportNavigator.Dijkstra.AStar
 {
     public class AStarPathFinder(IServiceScopeFactory serviceProvider) : DijkstraPathFinder<NodeAs>(serviceProvider)
     {
+        private const double R = 6371000;
         protected override void SyncNodes(long calendarId)
         {
             Available = Task.Run(async () =>
@@ -16,23 +18,45 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
-                    foreach (var busStop in context.BusStops)
+                    foreach (var siblings in context.BusStops.GroupBy(bs =>bs.Name)
+                                 .ToDictionary(g => g.Key, g => g))
                     {
-                        var node = new NodeAs
+                        foreach (var busStop in siblings.Value)
                         {
-                            BestArrivalTime = TimeSpan.MaxValue,
-                            BestDepartureTime = TimeSpan.MaxValue,
-                            PreviousNodeId = -1,
-                            PreviousBusId = -1,
-                            Connections = [],
-                            BestWeight = double.MaxValue,
-                            Coordinate = new Coordinate
+                            var node = new NodeAs
                             {
-                                X = busStop.CoordX,
-                                Y = busStop.CoordY,
+                                BusStopId = busStop.Id,
+                                BestArrivalTime = TimeSpan.MaxValue,
+                                PreviousNodeId = -1,
+                                PreviousBusId = -1,
+                                Connections = [],
+                                BestDepartureTime = TimeSpan.MaxValue,
+                                BestWeight = double.MaxValue,
+                                Checked = false,
+                                Coordinate = new Coordinate
+                                {
+                                    X = busStop.CoordX,
+                                    Y = busStop.CoordY,
+                                }
+                            };
+                            foreach (var siblingBusStop in siblings.Value.Except([busStop]))
+                            {
+                                var connection = new Connection
+                                {
+                                    BusId = 0,
+                                    ConnectionTime = 0,
+                                    DepartureTime = TimeSpan.Zero,
+                                    From = busStop.Id,
+                                    To = siblingBusStop.Id,
+                                };
+                                var sortedSet = new SortedSet<Connection>(new ConnectionComparer())
+                                {
+                                    connection
+                                };
+                                node.Connections.Add(connection.To, sortedSet);
                             }
-                        };
-                        nodes.TryAdd(busStop.Id, (NodeAs)node);
+                            nodes.Add(busStop.Id, (NodeAs)node);
+                        }
                     }
 
                     timetables = await context.Timetables
@@ -45,90 +69,108 @@ namespace PublicTransportNavigator.Dijkstra.AStar
 
                 foreach (var ttForBusId in timetables)
                 {
-
                     var busId = ttForBusId[0].BusId;
-                    var busStopIds = ttForBusId.Select(t => t.BusStopId).Distinct().ToList();
-                    var bestTimes = new Dictionary<TimeSpan, Connection>();
-                    foreach (var busStopId in busStopIds)
+                    for (var i = 0; i < ttForBusId.Count - 1; i++)
                     {
-                        var times = ttForBusId.Where(t => t.BusStopId == busStopId && t.BusId == busId)
-                            .Select(t => t.Time).ToHashSet();
-
+                        var firstBusStopId = ttForBusId[i].BusStopId;
+                        var nextBusStopId = ttForBusId[i + 1].BusStopId;
                         var connection = new Connection
                         {
-                            DepartureTimes = times,
-                            From = busStopId,
                             BusId = busId,
+                            DepartureTime = ttForBusId[i].Time,
+                            ConnectionTime = (ttForBusId[i + 1].Time - ttForBusId[i].Time).Minutes,
+                            From = firstBusStopId,
+                            To = nextBusStopId,
                         };
-                        bestTimes.TryAdd(times.Min(), connection);
-                    }
-
-                    while (bestTimes.Count > 1)
-                    {
-                        var first = bestTimes.Keys.Min();
-                        bestTimes.TryGetValue(first, out var firstConnection);
-                        bestTimes.Remove(first);
-
-                        var second = bestTimes.Keys.Min();
-                        bestTimes.TryGetValue(second, out var secondConnection);
-
-                        firstConnection.ConnectionTime = (second - first).Minutes;
-                        firstConnection.To = secondConnection.From;
-
-                        nodes.TryGetValue(firstConnection.From, out var fromNode);
-                        fromNode.Connections.Add(firstConnection);
-
-                        nodes.TryGetValue(firstConnection.To, out var toNode);
-                        toNode.Connections.Add(firstConnection);
+                        nodes.TryGetValue(firstBusStopId, out var currentNode);
+                        if (currentNode == null) continue;
+                        if (currentNode!.Connections.ContainsKey(connection.To))
+                        {
+                            currentNode.Connections.TryGetValue(connection.To, out var sortedSet);
+                            sortedSet?.Add(connection);
+                        }
+                        else
+                        {
+                            var sortedSet = new SortedSet<Connection>(new ConnectionComparer())
+                            {
+                                connection
+                            };
+                            currentNode?.Connections.Add(connection.To, sortedSet);
+                        }
                     }
                 }
                 _graphs.Add(calendarId, nodes);
             });
         }
-
         protected override void Recursive(NodeAs parentNode, long currentBusStopId, long destinationBusStopId, long calendarId)
         {
-            var nodes = _graphs[calendarId];
-            //change status of the current node; it is checked from now on
-            var departureTime = parentNode.BestArrivalTime;
-            parentNode.Checked = true;
-
-            //update all neighbours of the current node
-            foreach (var connection in parentNode.Connections.Where(c => c.From == currentBusStopId))
+            while (parentNode.BusStopId != destinationBusStopId)
             {
-                nodes.TryGetValue(connection.To, out var destinationStop);
-                var closestDepartureTime = FindClosestAfter(departureTime, connection.DepartureTimes);
-                if (closestDepartureTime == null) continue;
-                var aggregateTime =
-                    departureTime.Add(closestDepartureTime.Value - departureTime).Add(TimeSpan.FromMinutes(connection.ConnectionTime));
-                var weight = TimeSpanToFloat(aggregateTime) + GetDistance(destinationStop.Coordinate, destinationBusStopId, calendarId);
+                //change status of the current node; it is checked from now on
+                var departureTime = parentNode.BestArrivalTime;
+                parentNode.Checked = true;
 
-                if (destinationStop!.BestArrivalTime <= aggregateTime) continue;
+                //update all neighbours of the current node
+                //foreach neighbour bus stop find the closest time when passenger can get there from this bus stop
+                foreach (var connection in parentNode.Connections)
+                {
+                    _graphs[calendarId].TryGetValue(connection.Key, out var destinationStop);
 
-                destinationStop.BestArrivalTime = aggregateTime;
-                destinationStop.PreviousNodeId = currentBusStopId;
-                destinationStop.PreviousBusId = connection.BusId;
-                destinationStop.BestWeight = weight;
-                parentNode.BestDepartureTime = closestDepartureTime.Value;
+                    var fastestConnection = FindFastestConnection(departureTime, connection.Value);
+                    if (fastestConnection == null) continue;
 
+                    //aggregate time = starting time + waiting at the bus stop time + bus connection time
+                    var aggregateTime =
+                        departureTime.Add(fastestConnection.DepartureTime - departureTime)
+                            .Add(TimeSpan.FromMinutes(fastestConnection.ConnectionTime));
+
+                    //weight = total time in minutes + distance from destination in meters
+                    var weight = TimeSpanToDouble(aggregateTime);
+                    try
+                    {
+                        weight += GetDistance(destinationStop.Coordinate, destinationBusStopId, calendarId);
+                    }
+                    catch (Exception ex)
+                    {
+                        //very unlikely
+                    }
+
+                    //update bus stop that connection leads to if user would be there faster than previous best time
+                    if (destinationStop!.BestArrivalTime <= aggregateTime) continue;
+
+                    destinationStop.BestArrivalTime = aggregateTime;
+                    destinationStop.PreviousNodeId = currentBusStopId;
+                    destinationStop.PreviousBusId = fastestConnection.BusId;
+                    destinationStop.BestWeight = weight;
+
+                    parentNode.BestDepartureTime = fastestConnection.DepartureTime;
+                    _pQueue.Enqueue(destinationStop, weight);
+                }
+
+                //find node with the min best time that is not yet checked
+                try
+                {
+                    //var nextNode = _graphs[calendarId] //!
+                    //    .Where(pair => pair.Value.Checked == false)
+                    //    .MinBy(pair => pair.Value.BestWeight);
+                    parentNode = _pQueue.Dequeue();
+                    while (parentNode.Checked)
+                    {
+                        parentNode = _pQueue.Dequeue();
+                    }
+
+                    currentBusStopId = parentNode.BusStopId;
+                    //this means the algorithm has found the shortest path
+                    //if (parentNode.BusStopId == destinationBusStopId) return;
+
+                    //Recursive(nextNode, nextNode.BusStopId, destinationBusStopId, calendarId);
+                }
+                //that means that the algorithm has checked all the nodes and haven't found the destination node (unlikely)
+                catch (Exception ex)
+                {
+                }
             }
-
-            //find node with the min best time that is not yet checked
-            try
-            {
-                var nextNode = nodes
-                    .Where(pair => pair.Value.Checked == false)
-                    .MinBy(pair => pair.Value.BestWeight);
-
-                //this means the algorithm has found the shortest path
-                if (nextNode.Key == destinationBusStopId) return;
-
-                Recursive(nextNode.Value, nextNode.Key, destinationBusStopId, calendarId);
-            }
-            //that means that the algorithm has checked all the nodes and haven't found the destination node (unlikely)
-            catch (Exception ex) { }
         }
-
         public override void CleanUpNodes(long calendarId)
         {
             Available = Task.Run(() =>
@@ -145,13 +187,13 @@ namespace PublicTransportNavigator.Dijkstra.AStar
                 }
             );
         }
-
         private double GetDistance(Coordinate c1, long destinationBusStopId, long calendarId)
         {
             var nodes = _graphs[calendarId];
             nodes.TryGetValue(destinationBusStopId, out var destinationNode);
+            if (destinationNode == null) throw new ArgumentException();
             var c2 = destinationNode.Coordinate;
-            // Check if either coordinate is null or has null values
+        
             if (c1 == null || c2 == null || !c1.X.HasValue || !c1.Y.HasValue || !c2.X.HasValue || !c2.Y.HasValue)
             {
                 throw new ArgumentException("Both coordinates must have valid X and Y values.");
@@ -161,26 +203,17 @@ namespace PublicTransportNavigator.Dijkstra.AStar
             {
                 return 0;
             }
-
-            //// Calculate Euclidean distance
-            //var deltaX = c1.X.Value - c2.X.Value;
-            //var deltaY = c1.Y.Value - c2.Y.Value;
-
-            //return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
-
-            const double R = 6371000; 
             var dLat = (c1.X - c2.X) * Math.PI / 180; 
             var dLon = (c1.Y - c2.Y) * Math.PI / 180;
-            var a = Math.Sin(dLat.Value / 2) * Math.Sin(dLat.Value / 2) +
+            var a = Math.Sin(dLat!.Value / 2) * Math.Sin(dLat.Value / 2) +
                        Math.Cos(c1.X.Value * Math.PI / 180) * Math.Cos(c2.X.Value * Math.PI / 180) *
-                       Math.Sin(dLon.Value / 2) * Math.Sin(dLon.Value / 2);
+                       Math.Sin(dLon!.Value / 2) * Math.Sin(dLon.Value / 2);
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return R * c; 
+            return (R * c)/84; 
         }
-
-        private static int TimeSpanToFloat(TimeSpan time)
+        private double TimeSpanToDouble(TimeSpan time)
         {
-            return time.Minutes;
+            return time.TotalMinutes;
         }
     }
 }

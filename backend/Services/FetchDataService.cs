@@ -65,28 +65,6 @@ namespace PublicTransportNavigator.Services
 
         }
 
-        private async Task ConnectMatchingBusStops()
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var context =
-                scope.ServiceProvider
-                    .GetRequiredService<PublicTransportNavigatorContext>();
-            var matchingBusStops = await context.BusStops.GroupBy(bs => bs.Name).ToListAsync();
-            var connections = new List<Timetable>();
-            foreach (var friends in matchingBusStops)
-            {
-                var listOfFriends = new List<long>();
-                foreach (var friend in friends)
-                { listOfFriends.Add(friend.Id);
-                }
-                foreach (var friend in friends)
-                {
-                    //friend.SiblingId
-                }
-
-            }
-        }
-
         private async Task UpdateCalendar()
         {
             var regex = new Regex(CalendarRegexPattern);
