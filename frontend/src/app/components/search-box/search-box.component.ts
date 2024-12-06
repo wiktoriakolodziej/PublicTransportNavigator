@@ -49,6 +49,7 @@ export class SearchBoxComponent{
   filteredToValues : string[] = Object.values(this.filteredToOptions);
 
   timeValue: string = '';
+  formattedTime : string = '';
 
 
   isFirstFromFocus = true;
@@ -131,8 +132,31 @@ export class SearchBoxComponent{
   }
 
   isFormComplete() {
-    return this.dateControl.value && this.fromControl.value && this.toControl.value && this.timeValue != "";
-    
+    return this.dateControl.value && this.fromControl.value && this.toControl.value && this.formatTime(this.timeValue);
+  }
+
+  formatTime(time: string): boolean {
+    const timeRegex = /^(\d{1,2}):(\d{1,2})$/;
+    const match = this.timeValue.match(timeRegex);
+  
+    if (!match) {
+      return false; 
+    }
+  
+    let [_, hoursStr, minutesStr] = match;
+    let hours = parseInt(hoursStr, 10);
+    let minutes = parseInt(minutesStr, 10);
+  
+
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      return false;
+    }
+  
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+  
+    this.formattedTime = `${formattedHours}:${formattedMinutes}`;
+    return true;
   }
 
   searchRoutes() {
@@ -161,11 +185,14 @@ export class SearchBoxComponent{
     .find(([key, value]) => value === this.fromControl.value)?.[0]; 
     const to =  Object.entries(this.filteredToOptions)
     .find(([key, value]) => value === this.toControl.value)?.[0]; 
-    console.log('navigating');
+    
+    if(this.timeValue != this.formattedTime)
+      this.formatTime(this.timeValue);
     
 
+
     this.router.navigate(['/mainPage']).then(() => {this.router.navigate(['/searchRoutes'], { 
-      queryParams: {from: from, to: to,  date: formattedDate, time: this.timeValue }
+      queryParams: {from: from, to: to,  date: formattedDate, time: this.formattedTime }
     });});
     
   }

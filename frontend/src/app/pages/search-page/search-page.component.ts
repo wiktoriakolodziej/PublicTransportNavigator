@@ -57,6 +57,8 @@ export class SearchPageComponent implements OnInit, AfterViewInit  {
     
     let dayOfWeek = day ? parseInt(day, 10) : 0;
     console.log(dayOfWeek);
+
+    
     
     this.service.getRoutes(this.from, this.to, this.time, dayOfWeek).subscribe({
       next: (data: RoutePreviewDTO) => {

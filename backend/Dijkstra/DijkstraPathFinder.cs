@@ -243,9 +243,10 @@ namespace PublicTransportNavigator.Dijkstra
             nodes.TryGetValue(destinationBusStopId, out var node);
             RouteDetails result = new()
             {
-                DestinationTime = node!.BestArrivalTime,
+                DestinationTime = new TimeSpan(0, node.BestArrivalTime.Hours, node.BestArrivalTime.Minutes, 0),
                 Id = Guid.NewGuid().ToString(),
             };
+            var destinationTimeWithDays = node.BestArrivalTime;
            
             while (node.PreviousBusId == 0)
             {
@@ -277,10 +278,12 @@ namespace PublicTransportNavigator.Dijkstra
                     BusName = busName ?? "undefined bus name",
                     Details =
                     {
-                        node.BestArrivalTime + " " + (busStopName ?? "undefined bus stop name")
+                         new TimeSpan(0, node.BestArrivalTime.Hours, node.BestArrivalTime.Minutes, 0) + " " + (busStopName ?? "undefined bus stop name")
                     }
                 };
-               
+                previousTravelTime = node.TravelTime;
+                timeAtPreviousBusStop = node.BestArrivalTime;
+
 
                 nodes.TryGetValue(node.PreviousNodeId!.Value, out node);
                 while (node!.PreviousBusId == currentBusId || node.PreviousBusId == 0)
@@ -288,7 +291,7 @@ namespace PublicTransportNavigator.Dijkstra
                     if (node.PreviousBusId != 0 && currentBusId != 0)
                     {
                         busStopsWithNames.TryGetValue(node.BusStopId, out busStopName);
-                        part.Details.Add(node.BestArrivalTime + " " + (busStopName ?? "undefined bus stop name"));
+                        part.Details.Add(new TimeSpan(0, node.BestArrivalTime.Hours, node.BestArrivalTime.Minutes, 0) + " " + (busStopName ?? "undefined bus stop name"));
                         previousTravelTime = node.TravelTime;
                         timeAtPreviousBusStop = node.BestArrivalTime;
                     }
@@ -297,15 +300,15 @@ namespace PublicTransportNavigator.Dijkstra
 
                 //add the first bus stop (also the last bus stop for another connection)
                 busStopsWithNames.TryGetValue(node.BusStopId, out busStopName);
-                part.Details.Add(timeAtPreviousBusStop.Subtract(TimeSpan.FromMinutes(previousTravelTime)) + " " + (busStopName ?? "undefined bus stop name"));
+                var x = timeAtPreviousBusStop.Subtract(TimeSpan.FromMinutes(previousTravelTime));
+                part.Details.Add(new TimeSpan(0, x.Hours, x.Minutes, 0) + " " + (busStopName ?? "undefined bus stop name"));
 
 
                 part.Details.Reverse();
                 result.Parts.Add(part);
             }
-
             result.DepartureTime = timeAtPreviousBusStop.Subtract(TimeSpan.FromMinutes(previousTravelTime));
-            result.TravelTime = result.DestinationTime.TotalMinutes - result.DepartureTime.TotalMinutes;
+            result.TravelTime = destinationTimeWithDays.TotalMinutes - result.DepartureTime.TotalMinutes;
 
             result.Parts.Reverse();
             return result;

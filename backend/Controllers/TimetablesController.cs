@@ -66,9 +66,16 @@ namespace PublicTransportNavigator.Controllers
         public async Task<IActionResult> GetPath([FromQuery] long sourceBusStopId,
             [FromQuery] long destinationBusStopId, [FromQuery] TimeSpan departureTime, [FromQuery] int day)
         {
-            var result = await repository.GetPath(sourceBusStopId, destinationBusStopId, departureTime, day);
-            if (result == null) return NotFound();
-            return Ok(result);
+            try
+            {
+                var result = await repository.GetPath(sourceBusStopId, destinationBusStopId, departureTime, day);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("path/details/{pathId}")]

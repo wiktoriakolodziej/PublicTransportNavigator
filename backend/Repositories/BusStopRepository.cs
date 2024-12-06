@@ -104,7 +104,10 @@ namespace PublicTransportNavigator.Repositories
                     })
                 .OrderBy(bs=> bs.Name.Length)
                 .ToListAsync();
-            return result.Count < 5 ? result : result[..5];
+            var distinctResult = result
+                .DistinctBy(bs => bs.Name) // Removes duplicates based on the Name property
+                .ToList();
+            return distinctResult.Count < 5 ? distinctResult : distinctResult[..5];
         }
 
         public async Task<IEnumerable<BusStopDTO>> GetFavourites(long id)
