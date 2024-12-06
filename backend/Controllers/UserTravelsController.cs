@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using PublicTransportNavigator;
 using PublicTransportNavigator.Dijkstra;
-using PublicTransportNavigator.DTOs;
-using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Repositories.Abstract;
 using PublicTransportNavigator.Services;
 
@@ -20,6 +12,7 @@ namespace PublicTransportNavigator.Controllers
     {
         private readonly IUserHistoryRepository _repository = repository;
         [HttpGet("preview/{id}/{page}/{pageSize}")]
+        [Authorize]
         public async Task<IActionResult> GetHistoryPreviewByUserId(long id, int page, int pageSize)
         {
             var result = await _repository.GetHistoryByUserId(id);

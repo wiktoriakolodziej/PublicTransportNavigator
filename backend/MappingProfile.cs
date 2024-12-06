@@ -42,9 +42,9 @@ namespace PublicTransportNavigator
                 .ForMember(dest => dest.Parts, opt => opt.MapFrom(src =>
                     src.Parts.Select(p => new RoutePartDTO
                     {
-                        BusId = p.Key, 
-                        BusName = p.Value.BusName,
-                        Details = p.Value.Details
+                        BusId = p.BusId, 
+                        BusName = p.BusName,
+                        Details = p.Details
                     }).ToList()))
                 .ForMember(dest => dest.Coordinates, opt => opt.MapFrom(src => src.Coordinates));
 

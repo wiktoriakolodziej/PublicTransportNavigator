@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Migrations;
 using PublicTransportNavigator.Models;
@@ -37,6 +38,7 @@ namespace PublicTransportNavigator.Controllers
         }
 
         [HttpGet("seat/{busId}")]
+        [Authorize]
         public async Task<IActionResult> GetBusSeatsForBus(long busId, [FromQuery] TimeSpan timeIn, [FromQuery] TimeSpan timeOut, [FromQuery] DateTime date)
         {
             try

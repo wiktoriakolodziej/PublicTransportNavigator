@@ -67,6 +67,7 @@ namespace PublicTransportNavigator.Controllers
             [FromQuery] long destinationBusStopId, [FromQuery] TimeSpan departureTime, [FromQuery] int day)
         {
             var result = await repository.GetPath(sourceBusStopId, destinationBusStopId, departureTime, day);
+            if (result == null) return NotFound();
             return Ok(result);
         }
 

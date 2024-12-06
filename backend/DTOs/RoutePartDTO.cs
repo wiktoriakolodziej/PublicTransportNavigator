@@ -4,6 +4,6 @@
     {
         public long BusId { get; set; }
         public string BusName { get; set; }
-        public Dictionary<TimeSpan, string> Details { get; set; } = [];
+        public List<string> Details { get; set; } = [];
     }
 }

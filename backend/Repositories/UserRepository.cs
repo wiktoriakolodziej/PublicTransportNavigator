@@ -47,13 +47,14 @@ namespace PublicTransportNavigator.Repositories
             if (user == null) throw new UnauthorizedAccessException("Bad credentials");
             if (!BCrypt.Net.BCrypt.Verify(login.Password, user[0].Password))
                 throw new UnauthorizedAccessException("Bad credentials");
-            var token = GenerateJwtToken(user[0]);
+            var expirationTime = DateTime.UtcNow.AddMinutes(_tokenExpirationInMinutes.Value);
+            var token = GenerateJwtToken(user[0], expirationTime);
             
             return new LoginResponseDTO
             {
                 User = _mapper.Map<UserDTO>(user[0]),
                 Token = token,
-                ExpirationTime = _tokenExpirationInMinutes.Value
+                ExpirationTime = new DateTimeOffset(expirationTime).ToUnixTimeSeconds(),
             };
         }
         public async Task<RegisterResponseDTO> Register(RegisterUserDTO registerUser)
@@ -86,7 +87,7 @@ namespace PublicTransportNavigator.Repositories
             }
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, DateTime expirationTime)
         {
             if (_tokenExpirationInMinutes == null)
             {
@@ -105,15 +106,15 @@ namespace PublicTransportNavigator.Repositories
                 new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat,  DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString()),
-                new Claim(JwtRegisteredClaimNames.Nbf, DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString())
+                new Claim(JwtRegisteredClaimNames.Iat,  DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_tokenExpirationInMinutes.Value),
+                expires: expirationTime,
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);

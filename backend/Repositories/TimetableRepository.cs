@@ -68,7 +68,7 @@ namespace PublicTransportNavigator.Repositories
             return _mapper.Map<TimetableDTO>(result);
         }
 
-        public async Task<RoutePreview> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, int dayOfWeek)
+        public async Task<RoutePreview?> GetPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, int dayOfWeek)
         {
             var dayPredicate = dayOfWeek switch
             {
@@ -83,6 +83,7 @@ namespace PublicTransportNavigator.Repositories
             };
             var calendarEntity = await _context.Calendar.FirstOrDefaultAsync(dayPredicate);
             var result =  await _pathFinder.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarEntity!.Id);
+            if (result == null) return null;
             var routeDetailsJson = JsonConvert.SerializeObject(result);
             _redisCacheService.SetAsync(result.Id.ToString(), routeDetailsJson, TimeSpan.FromMinutes(DefaultExpiryTime));
             return GetPreview(result);
@@ -117,7 +118,7 @@ namespace PublicTransportNavigator.Repositories
             DepartureTime = details.DepartureTime,
             DestinationTime = details.DestinationTime,
             TravelTime = details.TravelTime,
-            BusNumbers = details.Parts.Values
+            BusNumbers = details.Parts
                 .Select(part => part.BusName)
                 .ToList(),
             Coordinates = details.Coordinates,

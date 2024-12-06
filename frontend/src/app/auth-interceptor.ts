@@ -10,19 +10,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
 
   if (token && expiration) {
-    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-
+    const currentTime = Math.floor(Date.now() / 1000); 
+    console.log('current time: ' + currentTime);
+    console.log('expirtation' + Number(expiration));
+    
+    
     // If the token has expired
     if (Number(expiration) < currentTime) {
-      // Remove the expired token and expiration time
+     
       localStorage.removeItem('jwt');
       localStorage.removeItem('jwt_expiration');
-      // Redirect the user to the login page
-      router.navigate(['/login']);
+      localStorage.removeItem('userData')
+    
+      router.navigate(['/mainPage']);
+      alert("You have been logged out, log in again");
       return throwError('Token has expired');
     }
 
-    // Clone the request and add the Authorization header
     const clonedRequest = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

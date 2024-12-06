@@ -1,54 +1,62 @@
-﻿using System.Collections.Concurrent;
-using System.Configuration;
+﻿using PublicTransportNavigator.Dijkstra.AStar;
+using System.Collections.Concurrent;
 using System.Diagnostics;
-using PublicTransportNavigator.Dijkstra.AStar;
 
 namespace PublicTransportNavigator.Dijkstra
 {
-    public class PathFinderManager<TNode> : IPathFinderManager where TNode : Node
+    public class PathFinderManager : IPathFinderManager
     {
         private readonly int _checkIntervalMilliseconds;
         private readonly int _timeoutMilliseconds;
-        private readonly ConcurrentQueue<DijkstraPathFinder<TNode>> _workers = [];
-        private readonly IServiceScopeFactory _serviceProvider;
+        private readonly ConcurrentQueue<DijkstraPathFinder> _workers = [];
+        private readonly bool _properlyInitialized = true;
 
-        private void InitializeWorkers()
+        private const string PathFinderName = "PathFinderType";
+        private const string NumOfWorkers = "NumOfWorkers";
+        private const string CheckIntervalMilliseconds = "CheckIntervalMilliseconds";
+        private const string TimeoutMilliseconds = "TimeoutMilliseconds";
+        private void InitializeWorkers(string? pathFinderType, int numberOfWorkers, IServiceScopeFactory serviceProvider)
         {
+            switch (pathFinderType)
+            {
+                case "AStar":
+                    for (var i = 0; i < numberOfWorkers; i++)
+                        _workers.Enqueue(new AStarPathFinder(serviceProvider));
+                    break;
+                case "Dijkstra":
+                    for (var i = 0; i < numberOfWorkers; i++)
+                        _workers.Enqueue(new DijkstraPathFinder(serviceProvider));
+                    break;
+                default:
+                    throw new ArgumentException($"Argument named {PathFinderName} has a wrong value");
+            }
             foreach (var worker in _workers)
             {
                 worker.PrepareGraphs();
             }
         }
-
         public PathFinderManager(IConfiguration configuration, IServiceScopeFactory serviceProvider)
         {
-            _serviceProvider = serviceProvider;
 
             var pathFinderSettings = configuration.GetSection("PathFinderSettings");
-            int.TryParse(pathFinderSettings["NumOfWorkers"], out var numberOfWorkers);
-            int.TryParse(pathFinderSettings["CheckIntervalMilliseconds"], out _checkIntervalMilliseconds);
-            int.TryParse(pathFinderSettings["TimeoutMilliseconds"], out _timeoutMilliseconds);
+            int.TryParse(pathFinderSettings[NumOfWorkers], out var numberOfWorkers);
+            int.TryParse(pathFinderSettings[CheckIntervalMilliseconds], out _checkIntervalMilliseconds);
+            int.TryParse(pathFinderSettings[TimeoutMilliseconds], out _timeoutMilliseconds);
+            var pathFinderType = (pathFinderSettings[PathFinderName]);
 
-
-
-            for (var i = 0; i < numberOfWorkers; i++)
+            try
             {
-                if (typeof(TNode) == typeof(NodeAs))
-                {
-                    _workers.Enqueue(new AStarPathFinder(_serviceProvider) as DijkstraPathFinder<TNode>);
-                }
-                else
-                {
-                    _workers.Enqueue(new DijkstraPathFinder<TNode>(_serviceProvider));
-                }
+                InitializeWorkers(pathFinderType, numberOfWorkers, serviceProvider);
             }
-
-            InitializeWorkers();
-            //return Task.CompletedTask;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Couldn't initialize path finding workers in class {nameof(PathFinderManager)} reason: {ex.Message}");
+                _properlyInitialized = false;
+            }
         }
-
-        public async Task<RouteDetails> FindPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, long calendarId)
+        public async Task<RouteDetails?> FindPath(long sourceBusStopId, long destinationBusStopId, TimeSpan departureTime, long calendarId)
         {
+            if (!_properlyInitialized) return null;
             var stopwatch = Stopwatch.StartNew();
             while (stopwatch.ElapsedMilliseconds < _timeoutMilliseconds)
             {
@@ -56,9 +64,9 @@ namespace PublicTransportNavigator.Dijkstra
                 {
                     if (worker == null)
                         throw new Exception(
-                            $"Unexpected exception in {nameof(PathFinderManager<TNode>.FindPath)}, worker was null");
+                            $"Unexpected exception in {nameof(PathFinderManager.FindPath)}, worker was null");
                     await worker.Available;
-                    var result = worker.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarId);
+                    var result = await worker.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarId);
 
                     CleanUpNodes(worker, calendarId);
 
@@ -69,10 +77,9 @@ namespace PublicTransportNavigator.Dijkstra
                 await Task.Delay(_checkIntervalMilliseconds);
             }
 
-            throw new TimeoutException($"Waiting for available worker took too long, class {nameof(PathFinderManager<TNode>)}");
+            throw new TimeoutException($"Waiting for available worker took too long, class {nameof(PathFinderManager)}");
         }
-
-        private void CleanUpNodes(DijkstraPathFinder<TNode> worker, long calendarId)
+        private void CleanUpNodes(DijkstraPathFinder worker, long calendarId)
         {
             Task.Run(async () =>
             {
@@ -81,6 +88,5 @@ namespace PublicTransportNavigator.Dijkstra
                 _workers.Enqueue(worker);
             });
         }
-
     }
 }

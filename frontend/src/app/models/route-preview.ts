@@ -6,6 +6,6 @@ export interface RoutePreviewDTO {
     departureTime: string;
     destinationTime: string;
     travelTime: number;
-    busNumbers: number[];
+    busNumbers: string[];
     coordinates: CoordinateDTO[]; 
   }

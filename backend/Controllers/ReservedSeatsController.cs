@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,7 @@ namespace PublicTransportNavigator.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] ReservedSeatCreateDTO dto)
         {
             try
@@ -51,6 +53,7 @@ namespace PublicTransportNavigator.Controllers
         }
 
         [HttpGet("confirm/{id}")]
+        [Authorize]
         public async Task<IActionResult> Confirm(long id)
         {
             try
