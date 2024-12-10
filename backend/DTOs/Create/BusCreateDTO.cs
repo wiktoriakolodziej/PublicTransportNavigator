@@ -1,7 +1,7 @@
 ﻿using Microsoft.Build.Framework;
 using PublicTransportNavigator.Models.Enums;
 
-namespace PublicTransportNavigator.DTOs.old
+namespace PublicTransportNavigator.DTOs.Create
 {
     public class BusCreateDTO
     {

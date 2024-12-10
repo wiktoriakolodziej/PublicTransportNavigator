@@ -2,11 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.Models;
+using PublicTransportNavigator.PathFinder.Dijkstra;
 using PublicTransportNavigator.Services;
 
 namespace PublicTransportNavigator.Dijkstra.AStar
 {
-  
+
     public class AStarPathFinder(IServiceScopeFactory serviceProvider) : DijkstraPathFinder(serviceProvider)
     {
         private const double R = 6371000;

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PublicTransportNavigator.DTOs;
-using PublicTransportNavigator.DTOs.old;
+using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Repositories.Abstract;
 

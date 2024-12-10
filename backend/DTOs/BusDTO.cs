@@ -3,15 +3,15 @@ using PublicTransportNavigator.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace PublicTransportNavigator.DTOs.old
+namespace PublicTransportNavigator.DTOs
 {
     public class BusDTO
     {
         public long Id { get; set; }
         public string? Type { get; set; }
         public string? Number { get; set; }
-        public  long? FirstBusStopId { get; set; }
-        public  long? LastBusStopId { get; set; }
+        public long? FirstBusStopId { get; set; }
+        public long? LastBusStopId { get; set; }
         public List<Timetable>? Timetables { get; } = [];
         public List<BusSeat>? BusSeats { get; } = [];
         public BusStop? FirstBusStop { get; set; }

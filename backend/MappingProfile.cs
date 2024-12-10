@@ -2,7 +2,6 @@
 using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
-using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.DTOs.SyncData;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Models.Enums;

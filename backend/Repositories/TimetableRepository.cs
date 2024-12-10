@@ -1,17 +1,15 @@
-﻿using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
-using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Models.Enums;
 using PublicTransportNavigator.Repositories.Abstract;
 using PublicTransportNavigator.Services;
 using StackExchange.Redis;
+using System.Linq.Expressions;
 
 namespace PublicTransportNavigator.Repositories
 {
@@ -82,6 +80,7 @@ namespace PublicTransportNavigator.Repositories
                 _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Invalid day of the week.")
             };
             var calendarEntity = await _context.Calendar.FirstOrDefaultAsync(dayPredicate);
+            if (calendarEntity == null) return null;
             var result =  await _pathFinder.FindPath(sourceBusStopId, destinationBusStopId, departureTime, calendarEntity!.Id);
             if (result == null) return null;
             var routeDetailsJson = JsonConvert.SerializeObject(result);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PublicTransportNavigator.DTOs.old;
+using PublicTransportNavigator.DTOs;
+using PublicTransportNavigator.DTOs.Create;
 using PublicTransportNavigator.Migrations;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Repositories.Abstract;

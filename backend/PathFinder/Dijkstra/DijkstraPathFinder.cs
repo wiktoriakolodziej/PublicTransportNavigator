@@ -2,13 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.IdentityModel.Tokens;
+using PublicTransportNavigator.Dijkstra;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Services;
 
-namespace PublicTransportNavigator.Dijkstra
+namespace PublicTransportNavigator.PathFinder.Dijkstra
 {
-    public class DijkstraPathFinder (IServiceScopeFactory serviceProvider)
+    public class DijkstraPathFinder(IServiceScopeFactory serviceProvider)
     {
         protected readonly Dictionary<long, Dictionary<long, Node>> _graphs = [];
         protected readonly IServiceScopeFactory _serviceProvider = serviceProvider;
@@ -16,8 +17,8 @@ namespace PublicTransportNavigator.Dijkstra
         public Task? Available { get; protected set; }
         public void PrepareGraphs()
         {
-            var scope = _serviceProvider.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
+            using var scope = _serviceProvider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<PublicTransportNavigatorContext>();
             var calendar = context.Calendar;
             foreach (var calendarEntry in calendar)
             {
@@ -36,7 +37,7 @@ namespace PublicTransportNavigator.Dijkstra
                     foreach (var siblings in context.BusStops.GroupBy(bs => bs.Name)
                                  .ToDictionary(g => g.Key, g => g))
                     {
-                        if(siblings.Key.Contains("granica") || siblings.Key.Contains("[tech]")) continue;
+                        if (siblings.Key.Contains("granica") || siblings.Key.Contains("[tech]")) continue;
                         foreach (var busStop in siblings.Value)
                         {
                             var node = new Node
@@ -78,12 +79,12 @@ namespace PublicTransportNavigator.Dijkstra
                         .Join(
                             context.BusStops,
                             timetable => timetable.BusStopId,
-                            busStop => busStop.Id,            
-                            (timetable, busStop) => new { timetable, busStop } 
+                            busStop => busStop.Id,
+                            (timetable, busStop) => new { timetable, busStop }
                         )
                         .Where(joined =>
                                 joined.timetable.CalendarId == calendarId &&
-                                !joined.busStop.Name.Contains("granica") && 
+                                !joined.busStop.Name.Contains("granica") &&
                                 !joined.busStop.Name.Contains("[tech]")
                         )
                         .GroupBy(joined => joined.timetable.BusId)
@@ -193,7 +194,7 @@ namespace PublicTransportNavigator.Dijkstra
                 foreach (var connection in parentNode.Connections)
                 {
                     _graphs[calendarId].TryGetValue(connection.Key, out var destinationStop);
-                    if(destinationStop!.Checked) continue;
+                    if (destinationStop!.Checked) continue;
 
                     var fastestConnection = FindFastestConnection(departureTime, connection.Value);
                     if (fastestConnection == null) continue;
@@ -247,7 +248,7 @@ namespace PublicTransportNavigator.Dijkstra
                 Id = Guid.NewGuid().ToString(),
             };
             var destinationTimeWithDays = node.BestArrivalTime;
-           
+
             while (node.PreviousBusId == 0)
             {
                 nodes.TryGetValue(node.PreviousNodeId!.Value, out node);
@@ -263,7 +264,7 @@ namespace PublicTransportNavigator.Dijkstra
 
             var previousTravelTime = 0;
             var timeAtPreviousBusStop = TimeSpan.Zero;
-            
+
             while (node!.PreviousNodeId != -1)
             {
                 Console.WriteLine(
@@ -309,6 +310,7 @@ namespace PublicTransportNavigator.Dijkstra
             }
             result.DepartureTime = timeAtPreviousBusStop.Subtract(TimeSpan.FromMinutes(previousTravelTime));
             result.TravelTime = destinationTimeWithDays.TotalMinutes - result.DepartureTime.TotalMinutes;
+            result.Coordinates.Add(node!.Coordinate!);
 
             result.Parts.Reverse();
             return result;
@@ -320,7 +322,7 @@ namespace PublicTransportNavigator.Dijkstra
         protected TimeSpan GetTimeSpanBetweenTimes(TimeSpan first, TimeSpan second)
         {
             if (first <= second) return second - first;
-            
+
             TimeSpan days;
             var firstTimeInMinutes = first.Hours * 60 + first.Minutes;
             var secondTimeInMinutes = second.Hours * 60 + second.Minutes;

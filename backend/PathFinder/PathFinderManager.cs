@@ -1,4 +1,5 @@
 ﻿using PublicTransportNavigator.Dijkstra.AStar;
+using PublicTransportNavigator.PathFinder.Dijkstra;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -8,8 +9,11 @@ namespace PublicTransportNavigator.Dijkstra
     {
         private readonly int _checkIntervalMilliseconds;
         private readonly int _timeoutMilliseconds;
+        private readonly int _numberOfWorkers;
+        private readonly string? _pathFinderType;
         private readonly ConcurrentQueue<DijkstraPathFinder> _workers = [];
-        private readonly bool _properlyInitialized = true;
+        private bool _properlyInitialized = true;
+        private readonly IServiceScopeFactory _serviceProvider;
 
         private const string PathFinderName = "PathFinderType";
         private const string NumOfWorkers = "NumOfWorkers";
@@ -37,16 +41,16 @@ namespace PublicTransportNavigator.Dijkstra
         }
         public PathFinderManager(IConfiguration configuration, IServiceScopeFactory serviceProvider)
         {
-
+            _serviceProvider = serviceProvider;
             var pathFinderSettings = configuration.GetSection("PathFinderSettings");
-            int.TryParse(pathFinderSettings[NumOfWorkers], out var numberOfWorkers);
+            int.TryParse(pathFinderSettings[NumOfWorkers], out _numberOfWorkers);
             int.TryParse(pathFinderSettings[CheckIntervalMilliseconds], out _checkIntervalMilliseconds);
             int.TryParse(pathFinderSettings[TimeoutMilliseconds], out _timeoutMilliseconds);
-            var pathFinderType = (pathFinderSettings[PathFinderName]);
+            _pathFinderType = (pathFinderSettings[PathFinderName]);
 
             try
             {
-                InitializeWorkers(pathFinderType, numberOfWorkers, serviceProvider);
+                InitializeWorkers(_pathFinderType, _numberOfWorkers, _serviceProvider);
             }
             catch (Exception ex)
             {
@@ -87,6 +91,28 @@ namespace PublicTransportNavigator.Dijkstra
                 await worker.Available;
                 _workers.Enqueue(worker);
             });
+        }
+        public async Task SyncNodes()
+        {
+            if (!_properlyInitialized)
+            {
+                try
+                {
+                    InitializeWorkers(_pathFinderType, _numberOfWorkers, _serviceProvider);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Couldn't initialize path finding workers in class {nameof(PathFinderManager)} reason: {ex.Message}");
+                    _properlyInitialized = false;
+                    return;
+                }
+            }
+            foreach (var worker in _workers)
+            {
+                worker.PrepareGraphs();
+                //we need to await so the workers would sync nodes sequentially
+                await worker.Available;
+            }
         }
     }
 }
