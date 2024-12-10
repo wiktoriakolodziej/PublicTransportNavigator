@@ -1,6 +1,5 @@
 ﻿using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
-using PublicTransportNavigator.DTOs.old;
 
 namespace PublicTransportNavigator.Repositories.Abstract
 {

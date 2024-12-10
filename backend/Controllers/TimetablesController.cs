@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Pkcs;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using PublicTransportNavigator;
 using PublicTransportNavigator.DTOs;
 using PublicTransportNavigator.DTOs.Create;
-using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Models;
-using PublicTransportNavigator.Repositories;
 using PublicTransportNavigator.Repositories.Abstract;
 
 namespace PublicTransportNavigator.Controllers
