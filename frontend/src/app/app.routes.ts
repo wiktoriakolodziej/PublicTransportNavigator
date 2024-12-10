@@ -23,5 +23,5 @@ export const routes: Routes = [
         canActivate: [AuthGuardService],
     },
     {path: 'busStop/:stopNumber', component: BusStopPageComponent},
-    
+
 ];

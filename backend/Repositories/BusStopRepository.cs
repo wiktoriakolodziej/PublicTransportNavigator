@@ -13,7 +13,7 @@ namespace PublicTransportNavigator.Repositories
     {
         private readonly PublicTransportNavigatorContext _context = context;
         private readonly IMapper _mapper = mapper;
-        private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
+        //private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
         public async Task<BusStopDTO> Create(BusStopCreateDTO busStopDto)
         {
             var busStop = _mapper.Map<BusStop>(busStopDto);
@@ -52,9 +52,35 @@ namespace PublicTransportNavigator.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<BusStopDetailsDTO> GetDetails(long id)
+        public async Task<BusStopDetailsDTO> GetDetails(long id)
         {
-            throw new NotImplementedException();
+            var result = await (
+                from busStop in _context.BusStops
+                where busStop.Id == id
+                select new BusStopDetailsDTO
+                {
+                    Id = id,
+                    Name = busStop.Name,
+                    OnRequest = busStop.OnRequest,
+                    BusList = (
+                        from timetable in _context.Timetables
+                        where timetable.BusStopId == id
+                        select new BusOnBusStopDTO
+                        {
+                            Id = timetable.BusId,
+                            Number = (from bus in _context.Buses
+                                      where bus.Id == timetable.BusId
+                                      select bus.Number).First(),
+                            Time = (from t in _context.Timetables
+                                    where t.BusStopId == id && t.BusId == timetable.BusId
+                                    select
+                                        t.Time.ToString()
+                                ).ToList()
+                        }).GroupBy(b => b.Id)  // Group by BusId
+                        .Select(g => g.First()).ToList()
+                })
+                .FirstAsync();
+            return result;
         }
 
         public async Task<IEnumerable<BusStopDTO>> GetByFragment(string fragment, long? id)
@@ -78,7 +104,10 @@ namespace PublicTransportNavigator.Repositories
                     })
                 .OrderBy(bs=> bs.Name.Length)
                 .ToListAsync();
-            return result.Count < 5 ? result : result[..5];
+            var distinctResult = result
+                .DistinctBy(bs => bs.Name) // Removes duplicates based on the Name property
+                .ToList();
+            return distinctResult.Count < 5 ? distinctResult : distinctResult[..5];
         }
 
         public async Task<IEnumerable<BusStopDTO>> GetFavourites(long id)

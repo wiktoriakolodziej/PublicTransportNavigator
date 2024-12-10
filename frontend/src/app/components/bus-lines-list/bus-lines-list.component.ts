@@ -1,7 +1,9 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { Router } from '@angular/router';
+import { BusService } from '../../services/bus/bus.service';
+import { BusDTO } from '../../models/bus';
 
 @Component({
   selector: 'app-bus-lines-list',
@@ -10,17 +12,24 @@ import { Router } from '@angular/router';
   templateUrl: './bus-lines-list.component.html',
   styleUrl: './bus-lines-list.component.scss'
 })
-export class BusLinesListComponent {
+export class BusLinesListComponent implements OnInit {
   columns: number = 4;
-  tiles: string[] = ['1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6',
-                      '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6',
-                      '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6', '1', '2', '3', '4', '5', '6'];
+  tiles: number[] = [];
 
-  constructor(private router: Router) { 
+  constructor(private router: Router, private busService: BusService) { 
     this.adjustColumns(window.innerWidth);
   }
+  ngOnInit(): void {
+    this.busService.getBuses().subscribe({
+      next: (buses : BusDTO[]) =>{
+        buses.forEach(element => {
+          this.tiles.push(element.number);
+        })
+      }
+    });
+  }
 
-  onBusLine(number: string): void{
+  onBusLine(number: number): void{
     this.router.navigate(['/busLine', number]);
   }
 
@@ -39,3 +48,5 @@ export class BusLinesListComponent {
       }
     }
 }
+
+

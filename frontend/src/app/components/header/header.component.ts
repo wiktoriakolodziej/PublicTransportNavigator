@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../services/login/login.service';
 import { FormsModule } from '@angular/forms';
 import { LoginResponseDTO } from '../../models/login-response';
+import { RegisterDTO } from '../../models/register';
+import { RegisterResponseDTO } from '../../models/register-response';
 
 @Component({
   selector: 'app-header',
@@ -73,6 +75,7 @@ export class HeaderComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginDialog {
+  readonly dialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<LoginDialog>);
   hide = signal(true);
   loginData = { Login: '', Password: ''};
@@ -98,9 +101,52 @@ export class LoginDialog {
       }
     );
   }
-  createAccount(){
-      
+  createAccount(enterAnimationDuration: string, exitAnimationDuration: string){
+    this.dialog.open(RegisterDialog, {
+      width: '250px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+    });
   }
+}
 
-  
+@Component({
+  selector: 'register-dialog',
+  templateUrl: './register-dialog.html',
+  styleUrl: './register-dialog.scss',
+  standalone: true,
+  imports: [MatButtonModule, 
+            MatDialogActions, 
+            MatDialogClose, 
+            MatDialogTitle, 
+            MatDialogContent,
+            MatFormFieldModule, 
+            MatInputModule,
+            MatIconModule,
+            FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class RegisterDialog {
+  readonly dialogRef = inject(MatDialogRef<RegisterDialog>);
+  hide = signal(true);
+  registerInfo : RegisterDTO = {
+    userName: "",
+    userSurname: "",
+    password: ""
+};
+  constructor(private loginService: LoginService, private router: Router){}
+
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
+  }
+  register(){
+    
+    this.loginService.register(this.registerInfo!).subscribe((response : RegisterResponseDTO)=> {
+      if(response.message != "Registration successful"){
+        alert("something went wrong, try again");
+      }
+    })
+    this.dialogRef.close();
+  } 
 }

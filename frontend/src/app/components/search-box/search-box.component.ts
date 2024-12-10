@@ -49,6 +49,7 @@ export class SearchBoxComponent{
   filteredToValues : string[] = Object.values(this.filteredToOptions);
 
   timeValue: string = '';
+  formattedTime : string = '';
 
 
   isFirstFromFocus = true;
@@ -131,8 +132,31 @@ export class SearchBoxComponent{
   }
 
   isFormComplete() {
-    return this.dateControl.value && this.fromControl.value && this.toControl.value && this.timeValue != "";
-    
+    return this.dateControl.value && this.fromControl.value && this.toControl.value && this.formatTime(this.timeValue);
+  }
+
+  formatTime(time: string): boolean {
+    const timeRegex = /^(\d{1,2}):(\d{1,2})$/;
+    const match = this.timeValue.match(timeRegex);
+  
+    if (!match) {
+      return false; 
+    }
+  
+    let [_, hoursStr, minutesStr] = match;
+    let hours = parseInt(hoursStr, 10);
+    let minutes = parseInt(minutesStr, 10);
+  
+
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      return false;
+    }
+  
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+  
+    this.formattedTime = `${formattedHours}:${formattedMinutes}`;
+    return true;
   }
 
   searchRoutes() {
@@ -142,20 +166,35 @@ export class SearchBoxComponent{
     const day = date.getDate(); // Get the day (1-31)
     const month = date.getMonth() + 1; // Get the month (0-11), so add 1 to get (1-12)
     const year = date.getFullYear(); // Get the year (YYYY)
-    let formattedDate = `${day}-${month}-${year}`;
+    // Ensure month and day have two digits
+    let formattedMonth = month.toString().padStart(2, '0');
+    let formattedDay = day.toString().padStart(2, '0');
+
+    // Format the date
+    let formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
+    let dayOfWeek = date.getDay();
+    console.log(dayOfWeek);
+    dayOfWeek--;
+    console.log(dayOfWeek);
+    
+
     localStorage.setItem('selectedDate', formattedDate);
+    localStorage.setItem('dayOfWeek', dayOfWeek.toString());
 
     const from = Object.entries(this.filteredFromOptions)
     .find(([key, value]) => value === this.fromControl.value)?.[0]; 
     const to =  Object.entries(this.filteredToOptions)
     .find(([key, value]) => value === this.toControl.value)?.[0]; 
-
+    
+    if(this.timeValue != this.formattedTime)
+      this.formatTime(this.timeValue);
     
 
-  
-    this.router.navigate(['/searchRoutes'], { 
-      queryParams: {from: from, to: to,  date: formattedDate, time: this.timeValue }
-    });
+
+    this.router.navigate(['/mainPage']).then(() => {this.router.navigate(['/searchRoutes'], { 
+      queryParams: {from: from, to: to,  date: formattedDate, time: this.formattedTime }
+    });});
+    
   }
 }
 

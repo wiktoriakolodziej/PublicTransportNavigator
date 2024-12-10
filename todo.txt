@@ -1,0 +1,6 @@
+- fix display chosen params in search-page
+- add bus page component
+*
+- search more routes
+- use etags
+

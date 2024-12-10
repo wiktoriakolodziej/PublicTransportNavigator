@@ -5,9 +5,9 @@
         </mat-card>
         <div id="rightPanel">
             <div [ngClass]="{ 'bold': shouldShowBusStops }">
-                {{getDetailsById(0)?.[0]}} from: {{getDetailsById(0)?.[1]}}
+                from: {{getDetailsById(0)}}
             </div>
-            <div id="arrow">
+            <div id="arrow" *ngIf="shouldShowArrow()">
                 @if(!shouldShowBusStops){
                     <button mat-fab id="arrow-button" (click)="toggleDisplay()">
                         <mat-icon id="icon">keyboard_arrow_down</mat-icon>
@@ -29,7 +29,7 @@
                 }
             </div>
             <div [ngClass]="{ 'bold': shouldShowBusStops }">
-                {{getDetailsById(-1)?.[0]}} to: {{getDetailsById(-1)?.[1]}}
+                to: {{getDetailsById(-1)}}
             </div>
         </div>
     </mat-card-content>

@@ -47,31 +47,47 @@ namespace PublicTransportNavigator.Repositories
             if (user == null) throw new UnauthorizedAccessException("Bad credentials");
             if (!BCrypt.Net.BCrypt.Verify(login.Password, user[0].Password))
                 throw new UnauthorizedAccessException("Bad credentials");
-            var token = GenerateJwtToken(user[0]);
+            var expirationTime = DateTime.UtcNow.AddMinutes(_tokenExpirationInMinutes.Value);
+            var token = GenerateJwtToken(user[0], expirationTime);
             
             return new LoginResponseDTO
             {
                 User = _mapper.Map<UserDTO>(user[0]),
                 Token = token,
-                ExpirationTime = _tokenExpirationInMinutes.Value
+                ExpirationTime = new DateTimeOffset(expirationTime).ToUnixTimeSeconds(),
             };
         }
-        public async Task<UserDTO> Register(RegisterUserDTO registerUser)
+        public async Task<RegisterResponseDTO> Register(RegisterUserDTO registerUser)
         {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUser.Password);
-            var user = new User
+            try
             {
-                Name = registerUser.UserName,
-                Surname = registerUser.UserSurname,
-                Password = hashedPassword,
-                LastModified = DateTime.UtcNow
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<UserDTO>(user);
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUser.Password);
+                var user = new User
+                {
+                    Name = registerUser.UserName,
+                    Surname = registerUser.UserSurname,
+                    Password = hashedPassword,
+                    LastModified = DateTime.UtcNow
+                };
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+                var response = new RegisterResponseDTO
+                {
+                    Message = "Registration successful"
+                };
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = new RegisterResponseDTO
+                {
+                    Message = "Registration failed"
+                };
+                return response;
+            }
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, DateTime expirationTime)
         {
             if (_tokenExpirationInMinutes == null)
             {
@@ -90,15 +106,15 @@ namespace PublicTransportNavigator.Repositories
                 new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat,  DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString()),
-                new Claim(JwtRegisteredClaimNames.Nbf, DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds.ToString())
+                new Claim(JwtRegisteredClaimNames.Iat,  DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_tokenExpirationInMinutes.Value),
+                expires: expirationTime,
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -16,7 +16,7 @@ export class RoutePreviewComponent {
     timeIn : string = "15:30";
     timeOut : string = "15:45";
     duration : string = "15 min";
-    buses : number[] = [];
+    buses : string[] = [];
 
     ngOnChanges() {
       if (this.copy) { 

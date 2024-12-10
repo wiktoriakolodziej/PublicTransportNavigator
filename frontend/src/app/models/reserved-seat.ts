@@ -5,6 +5,6 @@ export interface ReservedSeatDTO {
     timetableOffId: number;
     userTravelId: number;
     reservationDate: string;
-    travelId: number;
+
   }
   

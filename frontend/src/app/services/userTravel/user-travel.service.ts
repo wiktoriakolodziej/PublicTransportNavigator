@@ -1,28 +1,28 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { apiUrl } from '../../app.config';
-import { UserTravelCreateDTO } from '../../models/user-travel-create';
 import { RoutePreviewDTO } from '../../models/route-preview';
 import { Observable, of } from 'rxjs';
 import { TimetableService } from '../timetable/timetable.service';
+import { RouteDetailsDTO } from '../../models/route-details';
+import { HistoryDetailsDTO } from '../../models/history-details';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserTravelService {
   private baseUrl = apiUrl;
-  private serviceUrl = "UserTravel"
+  private serviceUrl = "UserTravels"
 
   constructor(private http: HttpClient, private timetableService: TimetableService) { }
 
-  createReservedSeat(item : UserTravelCreateDTO){
-    return this.http.post(`${this.baseUrl}/${this.serviceUrl}`, item);
+
+  getHistoryPreview(userId: number, page: number, pageSize: number) : Observable<RoutePreviewDTO[]>{
+    return this.http.get<RoutePreviewDTO[]>(`${this.baseUrl}/${this.serviceUrl}/preview/${userId}/${page}/${pageSize}`);  
   }
 
-  getHistoryPreview(userId: number) : Observable<RoutePreviewDTO[]>{
-      let test : RoutePreviewDTO[] = [];
-      return of(test);//this.timetableService.getRoutes(1, 12, "now");
-      
+  getHistoryDetails(id: number) : Observable<HistoryDetailsDTO>{
+    return this.http.get<HistoryDetailsDTO>(`${this.baseUrl}/${this.serviceUrl}/${id}`);
   }
 }
 

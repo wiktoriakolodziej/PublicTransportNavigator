@@ -1,7 +1,10 @@
+import { CoordinateDTO } from "./coordinateDTO";
+
 export interface BusSeatDTO {
     id: number;
-    label: string;
-    coordX: number;
-    coordY: number;
-    reserved: boolean;
+    busId: number;
+    seatType: string;
+    coordinate: CoordinateDTO;
+    available: boolean;
+    imagePath: string;
   }

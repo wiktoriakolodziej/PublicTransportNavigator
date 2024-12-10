@@ -33,12 +33,12 @@
             <img src={{busImagePath}} id="bus-image"/>
             <button 
               class="seat"
-              [style.background-color]="isSeatReserved(seat) ? 'red' : isSeatChosen(seat) ? 'blue' : 'green'"         
               *ngFor="let seat of seats" 
+              [style.background-color]="isSeatReserved(seat) ? 'red' : isSeatChosen(seat) ? 'blue' : 'green'"          
               (click)="reserveSeat(seat)"
-              [style.top.%]="seat.coordY"
-              [style.left.%]="seat.coordX">
-              {{ seat.label }}
+              [style.top.%]="seat.coordinate.y"
+              [style.left.%]="seat.coordinate.x">
+              <img [src]="getImage(seat.imagePath)" id="seat-image"/>
             </button>
           </div>
           <div id="next-seat-button">

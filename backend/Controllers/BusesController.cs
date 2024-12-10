@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PublicTransportNavigator.DTOs.old;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PublicTransportNavigator.DTOs;
+using PublicTransportNavigator.DTOs.Create;
+using PublicTransportNavigator.Migrations;
 using PublicTransportNavigator.Models;
 using PublicTransportNavigator.Repositories.Abstract;
 
@@ -34,6 +37,23 @@ namespace PublicTransportNavigator.Controllers
                 return BadRequest(ex.Message);
             }  
         }
+
+        [HttpGet("seat/{busId}")]
+        [Authorize]
+        public async Task<IActionResult> GetBusSeatsForBus(long busId, [FromQuery] TimeSpan timeIn, [FromQuery] TimeSpan timeOut, [FromQuery] DateTime date)
+        {
+            try
+            {
+                var result = await _busRepository.GetBusSeatsForBus(busId,  timeIn, timeOut, date);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            { 
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] BusCreateDTO? busDto)

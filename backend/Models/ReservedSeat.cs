@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 
 namespace PublicTransportNavigator.Models
@@ -13,11 +14,11 @@ namespace PublicTransportNavigator.Models
         public BusSeat? BusSeat { get; set; }
 
         [Column("timetable_in_id")]
-        public required long TimeInId { get; set; }
+        public long TimeInId { get; set; }
         public Timetable? TimeIn { get; set; }
 
         [Column("timetable_off_id")]
-        public required long TimeOffId { get; set; }
+        public long TimeOffId { get; set; }
         public Timetable? TimeOff { get; set; }
 
         [Column("user_travel_id")]
@@ -27,6 +28,9 @@ namespace PublicTransportNavigator.Models
         [Column("reservation_date")]
         [Required]
         public required DateTime Date { get; set; }
+
+        [Column("valid_until")]
+        public DateTime? ValidUntil { get; set; }
 
     }
 }

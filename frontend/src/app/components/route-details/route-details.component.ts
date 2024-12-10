@@ -28,35 +28,22 @@ export class RouteDetailsComponent{
   constructor(private timetableService: TimetableService, private busStopService: BusStopService){}
 
   getDetails() : string[]{
-    return Object.entries(this.part.details).map(([time, busStopName]) => `${time} : ${busStopName}`);
+    return this.part.details.slice(1, this.part.details.length - 1);
   }
   toggleDisplay(){
     this.shouldShowBusStops = !this.shouldShowBusStops;
   }
-  getDetailsById(index: number = -1): [string, string] | undefined {
+  getDetailsById(index: number = -1): string | undefined {
     if (index === -1) {
-      index = Object.keys(this.part.details).length - 1;
+      index = this.part.details.length - 1;
     }
-    const entries = Object.entries(this.part.details);
-    if (index >= 0 && index < entries.length) {
-      const [time, busStopName] = entries[index];
-      return [time, busStopName]; 
-    }
-    return undefined; // Return undefined if the index is out of bounds
-  }
-  // getBusStops() : void{
-  //   if(this.busStops == null){
-  //     this.timetableService.getBusStops(this.routeDetailsDTO.timetableIn.busId, this.routeDetailsDTO.timetableOut.busStopId, this.routeDetailsDTO.timetableIn.busStopId).subscribe({
-  //       next: (data: BusStopDTO[]) => {
-  //         this.busStops = data;
-  //       },
-  //       error: (err) => {
-  //         console.error('Error fetching bus stops:', err);
-  //       }
-  //     });
-  //   }
-  //   this.shouldShowBusStops = !this.shouldShowBusStops;
-  //   console.log(this.busStops);
-  // }
+    if(index < 0 || index >= this.part.details.length)
+      return undefined; // Return undefined if the index is out of bounds
 
+    return this.part.details[index]; 
+  }
+
+  shouldShowArrow(): boolean{
+    return this.part.details.length > 2
+  }
 }

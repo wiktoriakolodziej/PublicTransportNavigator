@@ -21,6 +21,7 @@ import { LoginService } from '../../services/login/login.service';
 import { BusTypeService } from '../../services/busType/bus-type.service';
 import { SafeHtml, SafeUrl } from '@angular/platform-browser';
 import { ImageService } from '../../services/image/image.service';
+import { UserInfo } from '../../models/user-info';
 
 @Component({
   selector: 'app-route-details-page',
@@ -56,10 +57,10 @@ export class RouteDetailsPageComponent implements OnInit {
     constructor(private route: ActivatedRoute, private timetableService: TimetableService, private busService: BusService,
         private reservedSeatService: ReservedSeatService, private busTypeService: BusTypeService, private loginService : LoginService, private imagService: ImageService){}
   ngOnInit(): void {
+    
     this.route.params.subscribe(params =>{
       this.routePreview = JSON.parse(params['routePreview']);
     }); 
-    console.log(this.routePreview);
     
     this.timetableService.getRouteDetails(this.routePreview.id).subscribe({
       next: (data: RouteDetailsDTO) => {
@@ -75,20 +76,11 @@ export class RouteDetailsPageComponent implements OnInit {
   reserveSeats(): void{
       this.isReserveSeats = true;
       this.canReserveSeat = false;
-      this.busService.getBusSeats(this.routeDetails.parts[this.reservingForBus].busId).subscribe({
-        next: (data: BusSeatDTO[]) =>{
-          this.seats = data;
-        }
-      });
-      this.busTypeService.getByBusId(this.routeDetails.parts[this.reservingForBus].busId).subscribe(path => {
-        let relativePath = path.imagePath;
-        this.busImagePath = this.imagService.getImage(relativePath);
-      });
-      
+      this.getSeatDetails();   
   }
 
-  isSeatReserved(seat: any): boolean {
-    return seat.reserved;   
+  isSeatReserved(seat: BusSeatDTO): boolean {
+    return !seat.available;   
   }
   isSeatChosen(seat: any): boolean {
     return seat == this.chosenSeat;   
@@ -103,71 +95,88 @@ export class RouteDetailsPageComponent implements OnInit {
   }
 
   nextSeat(): boolean{
+   
     if(this.chosenSeat == null)
     {
       alert('pick up a seat first');
       return false;
     }
-    let busData = this.routeDetails.parts[this.reservingForBus];
- 
-    let item: ReservdSeatCreateDTO = {
-      busSeatId: this.chosenSeat.id,
-      busIdIn: busData.busId,
-      timeIn: Object.keys(busData.details)[0],
-      timeOff: Object.keys(busData.details)[Object.keys(busData.details).length - 1],
-      reservationDate: localStorage.getItem("selectedDate")!,
 
-    }
-    this.reservedSeatService.createReservedSeat(item).subscribe({
-      next: (data: ReservedSeatDTO) =>{
-        if(this.travelId == null){
-          this.travelId = data.travelId;
-        }
-      }
-    })
+    this.createSeat();
 
     this.reservingForBus++;
     if(this.routeDetails.parts.length == this.reservingForBus + 1){
       this.nextOrFinishButtonLabel = "confirm";
     }
-    this.busService.getBusSeats(busData.busId).subscribe({
-      next: (data: BusSeatDTO[]) =>{
-        this.seats = data;
+
+    this.getSeatDetails();
+    return true;
+  }
+
+  getSeatDetails(){
+    var busId = this.routeDetails.parts[this.reservingForBus].busId;
+    const times = Object.keys(this.routeDetails.parts[this.reservingForBus].details);
+    var timeIn = times[0];
+    var timeOut = times[times.length - 1];
+    var date = localStorage.getItem('selectedDate');
+    this.busService.getBusSeats(busId, timeIn, timeOut, date!).subscribe(busSeat =>{
+        console.log(busSeat);
+        this.seats = busSeat;      
       }
-    });
-    this.chosenSeat = null;
+    );
     this.busTypeService.getByBusId(this.routeDetails.parts[this.reservingForBus].busId).subscribe(path => {
       let relativePath = path.imagePath;
-      this.busImagePath = this.imagService.getImage(relativePath);
+      this.busImagePath = this.getImage(relativePath);
     });
-    return true;
   }
 
   confirm(): void{
     if(this.chosenSeat == null)
-      {
-        alert('pick up a seat first');
-        return;
-      }
-      let busData = this.routeDetails.parts[this.reservingForBus];
-    //create reserved seat
-    let item: ReservdSeatCreateDTO = {
-      busSeatId: this.chosenSeat.id,
-      busIdIn: busData.busId,
-      timeIn: Object.keys(busData.details)[0],
-      timeOff: Object.keys(busData.details)[Object.keys(busData.details).length - 1],
-      reservationDate: localStorage.getItem("selectedDate")!,
+    {
+      alert('pick up a seat first');
+      return;
     }
-    this.reservedSeatService.createReservedSeat(item);
-    if(!this.reservedSeatService.confirmReservation(this.travelId!)){
-      alert('try again');
+    
+    this.createSeat();
+    
+    if(this.reservedSeatService.confirmReservation(this.travelId!).subscribe(result => { result > 0 })){
+      this.isReserveSeats = false;
+      alert('you have succesfully booked a trip');
     }
-    this.isReserveSeats = false;
-    alert('you have succesfully booked a trip');
-
   }
 
   checkIfLoggedIn() : boolean{
     return this.loginService.checkLoginStatus();
+  }
+
+  getImage(path: string) : string{
+    return this.imagService.getImage(path);
+  }
+
+  createSeat(): void{
+  
+      let part = this.routeDetails.parts[this.reservingForBus];
+   
+      let item: ReservdSeatCreateDTO = {
+        busSeatId: this.chosenSeat!.id,
+        timeIn: Object.keys(part.details)[0],
+        timeOff: Object.keys(part.details)[Object.keys(part.details).length - 1],
+        date: localStorage.getItem("selectedDate")!,
+        userTravelId: this.travelId,
+        userId: this.getUserData()!.id
+      }
+  
+      this.reservedSeatService.createReservedSeat(item).subscribe({
+        next: (data: ReservedSeatDTO) =>{
+          
+          if(this.travelId == null){
+            this.travelId = data.userTravelId;
+          }
+        }
+      });
+  }
+
+  getUserData(): UserInfo | null{
+    return this.loginService.getUserInfo();
   }
 }

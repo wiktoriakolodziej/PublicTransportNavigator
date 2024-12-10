@@ -1,6 +1,9 @@
 
 export interface BusDTO {
     id: number;
-    number : string;
-
+    number : number;
+    type: string; 
+    firstBusStopId: number;
+    lastBusStopId: number;
+    
   }

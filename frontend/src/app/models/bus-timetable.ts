@@ -1,5 +1,5 @@
 export interface BusTimetableDTO {
     id: number;
-    number : string;
+    number : number;
     time: string[];
   }

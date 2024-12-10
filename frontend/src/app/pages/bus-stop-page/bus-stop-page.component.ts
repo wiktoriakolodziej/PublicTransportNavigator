@@ -24,12 +24,9 @@ export class BusStopPageComponent implements OnInit{
     let id = this.route.snapshot.paramMap.get('stopNumber')!;
     this.busStopService.getTimetables(parseInt(id, 10)).subscribe({
       next: (data: BusStopDetailsDTO | null) => {
+        console.log(data);
+        
         this.busStopDetails = data;
-        this.busStopDetails!.buses = this.busStopDetails!.buses.concat(this.busStopDetails!.buses);
-        this.busStopDetails!.buses = this.busStopDetails!.buses.concat(this.busStopDetails!.buses);
-        this.busStopDetails!.buses = this.busStopDetails!.buses.concat(this.busStopDetails!.buses);
-        this.busStopDetails!.buses = this.busStopDetails!.buses.concat(this.busStopDetails!.buses);
-        this.busStopDetails!.buses = this.busStopDetails!.buses.concat(this.busStopDetails!.buses);
       }
     });
   }

@@ -12,7 +12,7 @@ namespace PublicTransportNavigator.Controllers
     public class BusStopsController(IBusStopRepository repository, PublicTransportNavigatorContext context) : Controller
     {
         private readonly IBusStopRepository _busStopRepository = repository;
-        private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
+        //private readonly ETagGenerator<BusStop> _etagGenerator = new(context);
 
         // GET: BusStops
         [HttpGet]
@@ -27,10 +27,10 @@ namespace PublicTransportNavigator.Controllers
         {
             try
             {
-                var etag = _etagGenerator.GenerateEtag(id);
-                Response.Headers["ETag"] = etag;
-                if (Request.Headers.ContainsKey("If-None-Match") && Request.Headers["If-None-Match"] == etag)
-                    return StatusCode(304);
+                //var etag = _etagGenerator.GenerateEtag(id);
+                //Response.Headers["ETag"] = etag;
+                //if (Request.Headers.ContainsKey("If-None-Match") && Request.Headers["If-None-Match"] == etag)
+                //    return StatusCode(304);
                 var busStop = await _busStopRepository.GetById(id);
                 if (busStop == null) return NotFound();
                 return Ok(busStop);
@@ -74,7 +74,7 @@ namespace PublicTransportNavigator.Controllers
             try
             {
                 var result = await _busStopRepository.Create(busStopDTO);
-                Response.Headers["ETag"] = _etagGenerator.GenerateEtag(result.Id);
+                //Response.Headers["ETag"] = _etagGenerator.GenerateEtag(result.Id);
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
             }
             catch (Exception ex)

@@ -15,11 +15,14 @@ export class TimetableService {
 
   constructor(private http: HttpClient) { }
 
-  getRoutes(from: number, to: number, time: string): Observable<RoutePreviewDTO> {
+  getRoutes(from: number, to: number, time: string, dayOfWeek: number): Observable<RoutePreviewDTO> {
+    console.log(dayOfWeek);
+    
     const params = new HttpParams()
       .set('sourceBusStopId', from)        
       .set('destinationBusStopId', to)       
-      .set('departureTime', time);           
+      .set('departureTime', time)
+      .set('day', dayOfWeek);           
 
     return this.http.get<RoutePreviewDTO>(`${this.baseUrl}/${this.serviceUrl}/path`, { params });
 
