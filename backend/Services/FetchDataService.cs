@@ -1,15 +1,10 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using System.IO.Compression;
-using System.Security.Policy;
-using System.Text.RegularExpressions;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using PublicTransportNavigator.Models;
-using Microsoft.CodeAnalysis.Differencing;
-using PublicTransportNavigator.DTOs.SyncData;
-using PublicTransportNavigator.DTOs.old;
 using PublicTransportNavigator.Dijkstra;
+using PublicTransportNavigator.DTOs.SyncData;
+using PublicTransportNavigator.Models;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace PublicTransportNavigator.Services
 {
