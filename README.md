@@ -1,0 +1,1 @@
+This project assists passengers in navigating the social transportation network within the Śląskie Voivodeship, offering features like seat reservations. To get started download and run the Docker Compose file.
